@@ -13,12 +13,16 @@ public final class Shell {
      * @param args user input
      */
     public static void main(String[] args) {
-        Shell shell = new Shell();
         Scanner sc = new Scanner(System.in);
         // Loop iteration variable needed to quit the loop
         boolean quit = false;
         ReversiBoard board = new ReversiBoard();
         System.out.println(board.toString());
+        ReversiBoard copyBoard = board.clone();
+        System.out.println(copyBoard.toString());
+        board.getBoard()[3][3].changeSide();
+        System.out.println(board.toString());
+        System.out.println(copyBoard.toString());
 
         /*
         // Main loop to get user input and execute it
@@ -61,13 +65,13 @@ public final class Shell {
                         int level = Integer.valueOf(tokens[1]);
                         switch (command) {
                             case 'L':
-                                // Choose the difficulty. 1 is the easiest, 7
+                                // Choose the difficulty. 1 is the easiest, 5
                                 // the highest
-                                if (level < 8 && level > 0) {
+                                if (level < 6 && level > 0) {
                                     board.setLevel(level);
                                 } else {
                                     System.err.println("Error! Choose a level"
-                                            + " between 1 and 7");
+                                            + " between 1 and 5");
                                 }
                                 break;
                             default:

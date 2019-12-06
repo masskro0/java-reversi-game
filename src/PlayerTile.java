@@ -3,7 +3,7 @@
  * position and a player side (or colour)
  */
 
-public class PlayerTile {
+public class PlayerTile implements Cloneable{
     private final int row;           // Row position
     private final int column;        // Column position
     private Player player;           // Human or Computer side (blue or red)
@@ -53,5 +53,17 @@ public class PlayerTile {
         } else {
             player = Player.Computer;
         }
+    }
+
+    //TODO kontrollieren, dokumentieren, testen
+    public PlayerTile clone() {
+        PlayerTile cloneTile;
+        try {
+            cloneTile = (PlayerTile) super.clone();
+            return cloneTile;
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
