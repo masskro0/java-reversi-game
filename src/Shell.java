@@ -17,17 +17,33 @@ public final class Shell {
         // Loop iteration variable needed to quit the loop
         boolean quit = false;
         ReversiBoard board = new ReversiBoard();
-        System.out.println(board.toString());
-        ReversiBoard copyBoard = board.clone();
-        System.out.println(copyBoard.toString());
-        board.getBoard()[3][3].changeSide();
-        System.out.println(board.toString());
-        System.out.println(copyBoard.toString());
 
-        /*
+        System.out.println(board.toString());
+        /*board = board.move(3,2);
+        System.out.println(board.toString());
+        board = board.machineMove();
+        System.out.println(board.toString());
+        board = board.move(1,2);
+        System.out.println(board.toString());
+        board = board.machineMove();
+        System.out.println(board.toString());
+        board.setLevel(5);
+        board = board.move(5,4);
+        System.out.println(board.toString());
+        board = board.machineMove();
+        System.out.println(board.toString());*/
+        board.setLevel(1);
+        board = board.move(5,4);
+        System.out.println(board.toString());
+        System.out.println(board.score());
+        board = board.machineMove();
+        System.out.println(board.toString());
+
+
+/*
         // Main loop to get user input and execute it
         while (!quit) {
-            System.out.print("reversi> ");
+            System.out.print("othello> ");
             // Get next input
             String input = sc.nextLine();
             // Remove whitespace until the first char appears
@@ -110,8 +126,8 @@ public final class Shell {
                     }
                 }
             }
-        }*/
-        sc.close();
+        }
+        sc.close();*/
     }
 
     /**

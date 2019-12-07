@@ -12,7 +12,7 @@ public class ReversiBoard implements Board {
     private final Player firstPlayer;       // Player who makes the inital move
     private GameState gameState;            // Current game state
     // Stores the player who made the previous move
-    private Player previousTurn;
+    private Player nextTurn;
     // Matrix with score values
     private final int[][] scoreBoard = initScoreBoard();
 
@@ -23,7 +23,7 @@ public class ReversiBoard implements Board {
     public ReversiBoard() {
         board = new PlayerTile[SIZE][SIZE];
         firstPlayer = Player.Human;
-        previousTurn = firstPlayer;
+        nextTurn = firstPlayer;
         initializeBoard();
         gameState = GameState.RUNNING;
     }
@@ -36,7 +36,7 @@ public class ReversiBoard implements Board {
     public ReversiBoard(final Player firstPlayer) {
          board = new PlayerTile[SIZE][SIZE];
          this.firstPlayer = firstPlayer;
-         previousTurn = firstPlayer;
+         nextTurn = firstPlayer;
          initializeBoard();
          gameState = GameState.RUNNING;
     }
@@ -63,7 +63,7 @@ public class ReversiBoard implements Board {
      * the ReversiBoard class
      * @return board as two dimensional array
      */
-    // TODO private
+    // TODO private und nachfragen was man machen kann
     public PlayerTile[][] getBoard() {
         return board;
     }
@@ -88,8 +88,8 @@ public class ReversiBoard implements Board {
         }
     }
 
-    // TODO dokumentieren aller scores, testen
-    private double score() {
+    // TODO dokumentieren aller scores, testen und auch nicht private...
+    double score() {
         int tScoreComputer = 0;
         int tScoreHuman = 0;
         int mScoreComputer = 0;
@@ -120,34 +120,41 @@ public class ReversiBoard implements Board {
                         - 4.0 * mScoreHuman);
         double scoreP = (64.0 / (2.0 * occupiedFields)) * (2.5 * pScoreHuman
                         - 3.0 * pScoreComputer);
+        //System.out.println("scoreT: " + scoreT);
+        //System.out.println("scoreM: " + scoreM);
+        //System.out.println("scoreP: " + scoreP);
         return scoreT + scoreM + scoreP;
     }
 
     // TODO da muss ne bessere lösung her und Doku
     private int countEmptyFieldsAroundTile(int row, int column) {
         int counter = 0;
-        if (getSlot(row - 1, column) == null) {
+        if (row > 0 && getSlot(row - 1, column) == null) {
             counter++;
         }
-        if (getSlot(row - 1, column + 1) == null) {
+        if (row > 0 && column < SIZE - 1
+                && getSlot(row - 1, column + 1) == null) {
             counter++;
         }
-        if (getSlot(row, column + 1) == null) {
+        if (column < SIZE - 1 && getSlot(row, column + 1) == null) {
             counter++;
         }
-        if (getSlot(row + 1, column + 1) == null) {
+        if (row < SIZE - 1 && column < SIZE - 1
+                && getSlot(row + 1, column + 1) == null) {
             counter++;
         }
-        if (getSlot(row + 1, column) == null) {
+        if (row < SIZE - 1 && getSlot(row + 1, column) == null) {
             counter++;
         }
-        if (getSlot(row + 1, column - 1) == null) {
+        if (column > 0 && row < SIZE - 1
+                && getSlot(row + 1, column - 1) == null) {
             counter++;
         }
-        if (getSlot(row, column - 1) == null) {
+        if (column > 0 && getSlot(row, column - 1) == null) {
             counter++;
         }
-        if (getSlot(row - 1, column - 1) == null) {
+        if (row > 0 && column > 0
+                && getSlot(row - 1, column - 1) == null) {
             counter++;
         }
         return counter;
@@ -442,7 +449,7 @@ public class ReversiBoard implements Board {
      * @param player Player who makes a turn
      * @return Boolean whether the player can make a turn or not
      */
-    private boolean possibleTurn(int row, int column, Player player) {
+    boolean possibleTurn(int row, int column, Player player) {
         // Checking if a tiles exists for each direction
         boolean hasNorthTile = (northDirection(row, column, player) != null);
         boolean hasNorthEastTile =
@@ -557,9 +564,9 @@ public class ReversiBoard implements Board {
      */
     @Override
     public Player next() {
-        if (previousTurn == Player.Human && possibleComputerTurn()) {
+        if (nextTurn == Player.Human && possibleComputerTurn()) {
             return Player.Computer;
-        } else if (previousTurn == Player.Computer && possibleHumanTurn()) {
+        } else if (nextTurn == Player.Computer && possibleHumanTurn()) {
             return Player.Human;
         } else if (possibleHumanTurn() && !possibleComputerTurn()) {
             return Player.Human;
@@ -583,7 +590,7 @@ public class ReversiBoard implements Board {
                         + "position.");
             } else if (!possibleTurn(row, col, Player.Human)) {
                 System.err.println("Error! This is not a possible turn.");
-            } else if (previousTurn != Player.Human) {
+            } else if (nextTurn != Player.Human) {
                 throw new IllegalMoveException("Error! Wait for your enemy's "
                         + "turn.");
             } else if (gameState == GameState.OVER) {
@@ -596,7 +603,7 @@ public class ReversiBoard implements Board {
                 // Flip all possible tiles, must be at least one
                 newBoard.flipAllTiles(row, col, Player.Human);
                 // Set human as the previous player
-                previousTurn = Player.Human;
+                newBoard.nextTurn = Player.Computer;
                 return newBoard;
             }
             return null;
@@ -611,8 +618,41 @@ public class ReversiBoard implements Board {
      * TODO implementieren, dokumentieren und testen
      */
     @Override
-    public Board machineMove() {
-        return null;
+    public ReversiBoard machineMove() {
+        ReversiBoard newBoard = null;
+        TreeNode[] nodes = new TreeNode[SIZE * SIZE - 4];
+        int counter = 0;
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (possibleTurn(i, j, Player.Computer)) {
+                    newBoard = clone();
+                    PlayerTile tile = new PlayerTile(i, j, Player.Computer);
+                    newBoard.board[i][j] = tile;
+                    System.out.println("(" + (i+1) + "," + (j+1) + ")");
+                    newBoard.flipAllTiles(i, j, Player.Computer);
+                    newBoard.nextTurn = Player.Human;
+                    TreeNode node = new TreeNode(newBoard, level, 0,
+                            Player.Human);
+                    node.minMaxAlgorithm();
+                    System.out.println(node.getScore());
+                    nodes[counter] = node;
+                    counter++;
+                }
+            }
+        }
+        double maxScore = Double.MIN_VALUE;
+        int index = 0;
+        for (int i = 0; i < nodes.length; i++) {
+            if (nodes[i] == null) {
+                break;
+            }
+            if (maxScore < nodes[i].getScore()) {
+                maxScore = nodes[i].getScore();
+                index = i;
+            }
+        }
+        nextTurn = Player.Human;
+        return nodes[index].getReversiBoard();
     }
 
     /**
@@ -714,12 +754,14 @@ public class ReversiBoard implements Board {
                 }
             }
         }
+        copyBoard.setLevel(level);
         copyBoard.gameState = gameState;
         return copyBoard;
     }
 
     /**
      * {@inheritDoc}
+     * // TODO ein whitespace abstand statt 2 am ende
      */
     @Override
     public String toString() {
