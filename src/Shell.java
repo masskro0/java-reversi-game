@@ -18,29 +18,6 @@ public final class Shell {
         boolean quit = false;
         ReversiBoard board = new ReversiBoard();
 
-        System.out.println(board.toString());
-        /*board = board.move(3,2);
-        System.out.println(board.toString());
-        board = board.machineMove();
-        System.out.println(board.toString());
-        board = board.move(1,2);
-        System.out.println(board.toString());
-        board = board.machineMove();
-        System.out.println(board.toString());
-        board.setLevel(5);
-        board = board.move(5,4);
-        System.out.println(board.toString());
-        board = board.machineMove();
-        System.out.println(board.toString());*/
-        board.setLevel(1);
-        board = board.move(5,4);
-        System.out.println(board.toString());
-        System.out.println(board.score());
-        board = board.machineMove();
-        System.out.println(board.toString());
-
-
-/*
         // Main loop to get user input and execute it
         while (!quit) {
             System.out.print("othello> ");
@@ -67,7 +44,7 @@ public final class Shell {
                             case 'M':
                                 // Make a turn
                                 // TODO
-                                // TODO außerhalb vom array
+                                board = move(row, column, board);
                                 break;
                             default:
                                 System.err.println("Error! Invalid command");
@@ -127,7 +104,49 @@ public final class Shell {
                 }
             }
         }
-        sc.close();*/
+        sc.close();
+    }
+
+ // TODO: else: Runtime error mit exception werfen aber wie
+    private static ReversiBoard move(int row, int column, ReversiBoard board) {
+        row--;
+        column--;
+        if (row < 0 || row >= Board.SIZE || column < 0
+                || column >= Board.SIZE) {
+            System.out.println("Error! Row and column index must be in the "
+                    + "range between 0 and " + (Board.SIZE - 1));
+            return board;
+        }
+        gameOver(board);
+        if (board.next() == Player.Human) {
+            ReversiBoard newBoardHuman = board.move(row, column);
+            if (newBoardHuman != null) {
+                ReversiBoard newBoardComputer = newBoardHuman.machineMove();
+                gameOver(newBoardComputer);
+                if (newBoardComputer != null) {
+                    return newBoardComputer;
+                } else {
+                    System.out.println("<Bot muss aussetzen>");
+                    return newBoardHuman;
+                }
+            }
+
+        }
+        return board;
+    }
+
+    private static boolean gameOver(ReversiBoard board) {
+        if (board.getNumberOfMachineTiles()
+                + board.getNumberOfHumanTiles() == 64) {
+            if (board.getNumberOfHumanTiles()
+                    > board.getNumberOfMachineTiles()) {
+                System.out.println("You have won!");
+            } else {
+                System.out.println("Machine has won.");
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -137,7 +156,8 @@ public final class Shell {
      */
     private static ReversiBoard switchPlayer(ReversiBoard board) {
         if (board.getFirstPlayer() == Player.Human) {
-            return new ReversiBoard(Player.Computer);
+            ReversiBoard newBoard = new ReversiBoard(Player.Computer);
+            return newBoard.machineMove();
         }
         return new ReversiBoard(Player.Human);
     }

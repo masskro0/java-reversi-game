@@ -1,4 +1,5 @@
 // TODO ALLES testen, dokumentieren, in 2 Klassen unterteilen?
+// TODO keine board methoden, alles in board berechnen und alles setten und getten
 public class TreeNode {
 
     private final ReversiBoard reversiBoard;
@@ -11,18 +12,17 @@ public class TreeNode {
     TreeNode(ReversiBoard reversiBoard, int level, int depth, Player player) {
         // Only the reference is needed here
         this.reversiBoard = reversiBoard;
-        children = new TreeNode[30];
+        children = new TreeNode[Board.SIZE * Board.SIZE - 4];
         this.level = level;
         this.depth = depth;
         this.nextPlayer = player;
         this.score = 0;
         if (depth < level - 1) {
-            System.out.println("mist aber auch");
             setChildren(reversiBoard);
         }
     }
 
-    private TreeNode[] getChildren() {
+    public TreeNode[] getChildren() {
         return children;
     }
 
@@ -32,9 +32,9 @@ public class TreeNode {
             for (int j = 0; j < Board.SIZE; j++) {
                 if (reversiBoard.possibleTurn(i, j, nextPlayer)) {
                     ReversiBoard newBoard = reversiBoard.clone();
-                    System.out.println("(" + (i+1) + "," + (j+1) + ")");
                     newBoard.getBoard()[i][j] = new PlayerTile(i, j,
                             nextPlayer);
+                    newBoard.flipAllTiles(i, j, nextPlayer);
                     TreeNode child;
                     if (nextPlayer == Player.Human) {
                         child = new TreeNode(newBoard, level, depth + 1,
@@ -58,9 +58,9 @@ public class TreeNode {
                 for (int j = 0; j < Board.SIZE; j++) {
                     if (reversiBoard.possibleTurn(i, j, nextPlayer)) {
                         ReversiBoard newBoard = reversiBoard.clone();
-                        System.out.println("(" + (i+1) + "," + (j+1) + ")");
                         newBoard.getBoard()[i][j] = new PlayerTile(i, j,
                                 nextPlayer);
+                        newBoard.flipAllTiles(i, j, nextPlayer);
                         TreeNode child;
                         if (nextPlayer == Player.Human) {
                             child = new TreeNode(newBoard, level, depth + 1,
@@ -81,12 +81,16 @@ public class TreeNode {
         return getChildren().length != 0;
     }
 
-    private Player getPreviousPlayer() {
+    public Player getNextPlayer() {
         return nextPlayer;
     }
 
     public double getScore() {
         return score;
+    }
+
+    public void setScore(double scoreValue) {
+        this.score = scoreValue;
     }
 
     ReversiBoard getReversiBoard() {
@@ -95,11 +99,11 @@ public class TreeNode {
 
     public TreeNode minMaxAlgorithm() {
         if (!hasChildren() || getChildren()[0] == null) {
-            score = reversiBoard.score();
+            this.score = reversiBoard.score();
             return this;
         } else {
             if (reversiBoard.next() == Player.Computer) {
-                double maxScore = Double.MIN_VALUE;
+                double maxScore = Integer.MIN_VALUE;
                 TreeNode maxNode = null;
                 for (TreeNode node: getChildren()) {
                     if (node == null) {
@@ -111,10 +115,11 @@ public class TreeNode {
                         maxNode = node;
                     }
                 }
-                score = reversiBoard.score() + maxScore;
+                this.score = reversiBoard.score() + maxScore;
+                //System.out.println("mit kinder: " + score);
                 return maxNode;
             } else {
-                double minScore = Double.MAX_VALUE;
+                double minScore = Integer.MAX_VALUE;
                 TreeNode minNode = null;
                 for (TreeNode node: getChildren()) {
                     if (node == null) {
@@ -127,6 +132,7 @@ public class TreeNode {
                     }
                 }
                 score = reversiBoard.score() + minScore;
+                //System.out.println("mit kinder: " + score);
                 return minNode;
             }
         }

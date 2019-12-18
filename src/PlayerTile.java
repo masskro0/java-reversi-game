@@ -55,7 +55,10 @@ public class PlayerTile implements Cloneable{
         }
     }
 
-    //TODO kontrollieren, dokumentieren, testen
+    /**
+     * This method creates and returns a deep copy of this player tile.
+     * @return A clone.
+     */
     public PlayerTile clone() {
         PlayerTile cloneTile;
         try {
