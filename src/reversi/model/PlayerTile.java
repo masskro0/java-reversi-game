@@ -1,18 +1,33 @@
+package reversi.model;
+
 /**
- * This class represents one player tile on the board. It has a defined
- * position and a player side (or colour)
+ * This class represents one player tile on the Reversi board. It has a defined
+ * position and an owner.
  */
 
-public class PlayerTile implements Cloneable{
-    private final int row;           // Row position
-    private final int column;        // Column position
-    private Player player;           // Human or Computer side (blue or red)
+public class PlayerTile implements Cloneable {
 
     /**
-     * Create a new player tile object on the field.
-     * @param row position
-     * @param column position
-     * @param player imitates the colour. Can be Human or Computer
+     * Defines the row index of this tile on the Reversi board.
+     */
+    private final int row;
+
+    /**
+     * Defines the column index of this tile on the Reversi board.
+     */
+    private final int column;
+
+    /**
+     * Specifies the owner of this tile, can be computer or human.
+     */
+    private Player player;
+
+    /**
+     * Create a new player tile object on the board.
+     *
+     * @param row Row index on the board.
+     * @param column Column index on the board.
+     * @param player Can be Human or Computer.
      */
     PlayerTile(final int row, final int column, final Player player) {
         this.row = row;
@@ -22,7 +37,8 @@ public class PlayerTile implements Cloneable{
 
     /**
      * Returns the row index.
-     * @return row index
+     *
+     * @return Row index of this tile.
      */
     public int getRow() {
         return row;
@@ -30,7 +46,8 @@ public class PlayerTile implements Cloneable{
 
     /**
      * Returns the column index.
-     * @return column index
+     *
+     * @return Column index of this tile.
      */
     public int getColumn() {
         return column;
@@ -38,14 +55,15 @@ public class PlayerTile implements Cloneable{
 
     /**
      * Returns the player who belongs this tile.
-     * @return Human or Computer
+     *
+     * @return Can be Human or Computer.
      */
     public Player getPlayer() {
         return player;
     }
 
     /**
-     * Change the player side to the opposite side.
+     * Change the owner of this tile.
      */
     public void changeSide() {
         if (player == Player.Computer) {
@@ -56,7 +74,8 @@ public class PlayerTile implements Cloneable{
     }
 
     /**
-     * This method creates and returns a deep copy of this player tile.
+     * This method creates and returns a deep copy of this PlayerTile object.
+     *
      * @return A clone.
      */
     public PlayerTile clone() {
