@@ -28,7 +28,7 @@ public class TreeNode {
 
     private void setChildren(ReversiBoard reversiBoard) {
     }
-
+/*
     private boolean hasChildren() {
         return getChildren().length != 0;
     }
@@ -50,5 +50,5 @@ public class TreeNode {
     }
 
     public TreeNode minMaxAlgorithm() {
-    }
+    }*/
 }
