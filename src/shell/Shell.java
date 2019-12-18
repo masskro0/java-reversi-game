@@ -1,8 +1,6 @@
 package shell;
 
-import reversi.model.Board;
-import reversi.model.Player;
-import reversi.model.ReversiBoard;
+import reversi.model.*;
 
 import java.util.Scanner;
 
@@ -27,58 +25,10 @@ public final class Shell {
         // Loop iteration variable needed to quit the loop.
         boolean quit = false;
         ReversiBoard board = new ReversiBoard();
-        /*
-        board.setLevel(1);
-        board = board.move(2,3);
-        board = board.machineMove();
-        board = board.move(5,4);
-        board = board.machineMove();
-        board = board.move(5,6);
-        board = board.machineMove();
-        board = board.move(2,1);
-        board = board.machineMove();
-        board = board.move(3,2);
-        board = board.machineMove();
-        board = board.move(7,7);
-        board = board.machineMove();
-        board = board.move(0,0);
-        board = board.machineMove();
-        board = board.move(3,1);
-        board = board.machineMove();
-        board = board.move(7,6);
-        board = board.machineMove();
-        board = board.move(1,0);
-        board = board.machineMove();
-        board = board.move(3,0);
-        board = board.machineMove();
-        board = board.move(2,5);
-        board = board.machineMove();
-        board = board.move(1,2);
-        board = board.machineMove();
-        board = board.move(0,1);
-        board = board.machineMove();
-        board = board.move(0,3);
-        board = board.machineMove();
-        board = board.move(0,5);
-        board = board.machineMove();
-        board = board.move(2,7);
-        board = board.machineMove();
-        board = board.move(3,5);
-        board = board.machineMove();
-        board = board.move(4,5);
-        board = board.machineMove();
-        board = board.move(4,1);
-        board = board.machineMove();
-        board = board.move(6,7);
-        board = board.machineMove();
-        board = board.move(3,7);
-        board = board.machineMove();
-        board = board.move(0,6);
         System.out.println(board);
-        board = board.machineMove();
-*/
+        System.out.println(board.possibleTurn(0,2, Player.Computer));
 
-
+        /*
         // Main loop to get user input and execute it.
         while (!quit) {
             System.out.print("othello> ");
@@ -151,7 +101,7 @@ public final class Shell {
                     printError("Invalid command");
                 }
             }
-        }
+        }*/
     }
 
     /**

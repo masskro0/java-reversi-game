@@ -211,238 +211,32 @@ public class ReversiBoard implements Board {
         return counter;
     }
 
-    /**
-     * This method checks if a player tile of the same player exists in the
-     * positive y-axis direction, which is not his direct neighbour.
-     * @param row Index of row position of a given reference tile
-     * @param column Index of column position of a given reference tile
-     * @param player Kind of player who owns the reference tile
-     * @return player tile of the same player, who is not his direct neighbour
-     * or null if he didn't one
-     */
-    private PlayerTile northDirection(int row, int column, Player player) {
-        for (int r = row; r >= 0; r--) {
-            // Did the searching algorithm reached the edge of the board, found
-            // a empty field or a tile of the same player as the direct
-            // neighbour in this direction?
-            if (r == 0 || getSlot(r - 1, column) == null
-                    || getSlot(row - 1, column) == player) {
-                break;
+    // Wenn was falsch ist dann hier
+    private PlayerTile[] validTiles(int row, int column, Player player) {
+        PlayerTile[] validTiles = new PlayerTile[Directions.values().length];
+        int counter = 0;
+        for (Directions direction: Directions.values()) {
+            int rowDir = row + direction.row;
+            int columnDir = column + direction.column;
+            boolean validRowDir = (rowDir >= 0 && rowDir < SIZE);
+            boolean validColumnDir = (columnDir >= 0 && rowDir < SIZE);
+            if (!validRowDir || !validColumnDir
+                    || getSlot(rowDir, columnDir) == null
+                    || getSlot(rowDir, columnDir) == player) {
+                continue;
             }
-            // Found a player tile of the same player which is not the direct
-            // neighbour?
-            if (r < row && getSlot(r - 1, column) == player) {
-                return board[r - 1][column];
-            }
-        }
-        return null;
-    }
-
-    /**
-     * This method checks if a player tile of the same player exists in the
-     * positive x-axis and y-axis direction, which is not his direct neighbour.
-     * @param row Index of row position of a given reference tile
-     * @param column Index of column position of a given reference tile
-     * @param player Kind of player who owns the reference tile
-     * @return player tile of the same player, who is not his direct neighbour
-     * or null if he didn't one
-     */
-    private PlayerTile northEastDirection(int row, int column, Player player) {
-        int r = row;        // variable row shouldn't be changed
-        int c = column;     // variable column shouldn't be changed
-        while (r >= 0 && c < SIZE) {
-            // Did the searching algorithm reached the edge of the board, found
-            // a empty field or a tile of the same player as the direct
-            // neighbour in this direction?
-            if (r == 0 || c == SIZE - 1 || getSlot(r - 1, c + 1) == null
-                    || getSlot(row - 1, column + 1) == player) {
-                break;
-            }
-            // Found a player tile of the same player which is not the direct
-            // neighbour?
-            if (r < row && c > column && getSlot(r - 1, c + 1) == player) {
-                return board[r - 1][c + 1];
-            }
-            r--;
-            c++;
-        }
-        return null;
-    }
-
-    /**
-     * This method checks if a player tile of the same player exists in the
-     * positive x-axis direction, which is not his direct neighbour.
-     * @param row Index of row position of a given reference tile
-     * @param column Index of column position of a given reference tile
-     * @param player Kind of player who owns the reference tile
-     * @return player tile of the same player, who is not his direct neighbour
-     * or null if he didn't one
-     */
-    private PlayerTile eastDirection(int row, int column, Player player) {
-        for (int c = column; c < SIZE; c++) {
-            // Did the searching algorithm reached the edge of the board, found
-            // a empty field or a tile of the same player as the direct
-            // neighbour in this direction?
-            if (c == SIZE - 1 || getSlot(row, c + 1) == null
-                    || getSlot(row, column + 1) == player) {
-                break;
-            }
-            // Found a player tile of the same player which is not the direct
-            // neighbour?
-            if (c > column && getSlot(row, c + 1) == player) {
-                return board[row][c + 1];
+            while (rowDir >= 0 && rowDir < SIZE && columnDir >= 0
+                    && columnDir < SIZE) {
+                if (getSlot(rowDir, columnDir) == player) {
+                    validTiles[counter] = board[rowDir][columnDir];
+                    counter++;
+                    break;
+                }
+                rowDir += direction.row;
+                columnDir += direction.column;
             }
         }
-        return null;
-    }
-
-    /**
-     * This method checks if a player tile of the same player exists in the
-     * positive x-axis and negative y-axis direction, which is not his direct
-     * neighbour.
-     * @param row Index of row position of a given reference tile
-     * @param column Index of column position of a given reference tile
-     * @param player Kind of player who owns the reference tile
-     * @return player tile of the same player, who is not his direct neighbour
-     * or null if he didn't one
-     */
-    private PlayerTile southEastDirection(int row, int column, Player player) {
-        int r = row;        // variable row shouldn't be changed
-        int c = column;     // variable column shouldn't be changed
-        while (r < SIZE && c < SIZE) {
-            // Did the searching algorithm reached the edge of the board, found
-            // a empty field or a tile of the same player as the direct
-            // neighbour in this direction?
-            if (r == SIZE - 1 || c == SIZE - 1 || getSlot(r + 1, c + 1) == null
-                    || getSlot(row + 1, column + 1) == player) {
-                break;
-            }
-            // Found a player tile of the same player which is not the direct
-            // neighbour?
-            if (r > row && c > column && getSlot(r + 1, c + 1) == player) {
-                return board[r + 1][c + 1];
-            }
-            r++;
-            c++;
-        }
-        return null;
-    }
-
-    /**
-     * This method checks if a player tile of the same player exists in the
-     * negative y-axis direction, which is not his direct neighbour.
-     * @param row Index of row position of a given reference tile
-     * @param column Index of column position of a given reference tile
-     * @param player Kind of player who owns the reference tile
-     * @return player tile of the same player, who is not his direct neighbour
-     * or null if he didn't one
-     */
-    private PlayerTile southDirection(int row, int column, Player player) {
-        for (int r = row; r < SIZE; r++) {
-            // Did the searching algorithm reached the edge of the board, found
-            // a empty field or a tile of the same player as the direct
-            // neighbour in this direction?
-            if (r == SIZE - 1 || getSlot(r + 1, column) == null
-                    || getSlot(row + 1, column) == player) {
-                break;
-            }
-            // Found a player tile of the same player which is not the direct
-            // neighbour?
-            if (r > row && getSlot(r + 1, column) == player) {
-                return board[r + 1][column];
-            }
-        }
-        return null;
-    }
-
-    /**
-     * This method checks if a player tile of the same player exists in the
-     * negative x-axis and y-axis direction, which is not his direct neighbour.
-     * @param row Index of row position of a given reference tile
-     * @param column Index of column position of a given reference tile
-     * @param player Kind of player who owns the reference tile
-     * @return player tile of the same player, who is not his direct neighbour
-     * or null if he didn't one
-     */
-    private PlayerTile southWestDirection(int row, int column, Player player) {
-        int r = row;        // variable row shouldn't be changed
-        int c = column;     // variable column shouldn't be changed
-        while (r < SIZE && c >= 0) {
-            // Did the searching algorithm reached the edge of the board, found
-            // a empty field or a tile of the same player as the direct
-            // neighbour in this direction?
-            if (r == SIZE - 1 || c == 0 || getSlot(r + 1, c - 1) == null
-                    || getSlot(row + 1, column - 1) == player) {
-                break;
-            }
-            // Found a player tile of the same player which is not the direct
-            // neighbour?
-            if (r > row && c < column && getSlot(r + 1, c - 1) == player) {
-                return board[r + 1][c - 1];
-            }
-            r++;
-            c--;
-        }
-        return null;
-    }
-
-    /**
-     * This method checks if a player tile of the same player exists in the
-     * negative x-axis direction, which is not his direct neighbour.
-     * @param row Index of row position of a given reference tile
-     * @param column Index of column position of a given reference tile
-     * @param player Kind of player who owns the reference tile
-     * @return player tile of the same player, who is not his direct neighbour
-     * or null if he didn't one
-     */
-    private PlayerTile westDirection(int row, int column, Player player) {
-        for (int c = column; c >= 0; c--) {
-            // Did the searching algorithm reached the edge of the board, found
-            // a empty field or a tile of the same player as the direct
-            // neighbour in this direction?
-            if (c == 0 || getSlot(row, c - 1) == null
-                    || getSlot(row, column - 1) == player) {
-                break;
-            }
-            // Found a player tile of the same player which is not the direct
-            // neighbour?
-            if (c < column && getSlot(row, c - 1) == player) {
-                return board[row][c - 1];
-            }
-        }
-        return null;
-    }
-
-    /**
-     * This method checks if a player tile of the same player exists in the
-     * negative x-axis and positive y-axis direction, which is not his direct
-     * neighbour.
-     * @param row Index of row position of a given reference tile
-     * @param column Index of column position of a given reference tile
-     * @param player Kind of player who owns the reference tile
-     * @return player tile of the same player, who is not his direct neighbour
-     * or null if he didn't one
-     */
-    private PlayerTile northWestDirection(int row, int column, Player player) {
-        int r = row;        // variable row shouldn't be changed
-        int c = column;     // variable column shouldn't be changed
-        while (r >= 0 && c >= 0) {
-            // Did the searching algorithm reached the edge of the board, found
-            // a empty field or a tile of the same player as the direct
-            // neighbour in this direction?
-            if (r == 0 || c == 0 || getSlot(r - 1, c - 1) == null
-                    || getSlot(row - 1, column - 1) == player) {
-                break;
-            }
-            // Found a player tile of the same player which is not the direct
-            // neighbour?
-            if (r < row && c < column && getSlot(r - 1, c - 1) == player) {
-                return board[r - 1][c - 1];
-            }
-            r--;
-            c--;
-        }
-        return null;
+        return validTiles;
     }
 
     /**
@@ -456,40 +250,11 @@ public class ReversiBoard implements Board {
      * @param column Column index of the initial tile
      * @param player Human or Computer, who belongs the initial tile
      */
-    // TODO Was ist mit Sichtbarkeit
     private void flipAllTiles(int row, int column, Player player) {
-        // Player tiles of all directions
-        PlayerTile northTile = northDirection(row, column, player);
-        PlayerTile northEastTile = northEastDirection(row, column, player);
-        PlayerTile eastTile = eastDirection(row, column, player);
-        PlayerTile southEastTile = southEastDirection(row, column, player);
-        PlayerTile southTile = southDirection(row, column, player);
-        PlayerTile southWestTile = southWestDirection(row, column, player);
-        PlayerTile westTile = westDirection(row, column, player);
-        PlayerTile northWestTile = northWestDirection(row, column, player);
-        if (northTile != null) {
-            flipTiles(northTile, board[row][column]);
-        }
-        if (northEastTile != null) {
-            flipTiles(northEastTile, board[row][column]);
-        }
-        if (eastTile != null) {
-            flipTiles(board[row][column], eastTile);
-        }
-        if (southEastTile != null) {
-            flipTiles(board[row][column], southEastTile);
-        }
-        if (southTile != null) {
-            flipTiles(board[row][column], southTile);
-        }
-        if (southWestTile != null) {
-            flipTiles(board[row][column], southWestTile);
-        }
-        if (westTile != null) {
-            flipTiles(westTile, board[row][column]);
-        }
-        if (northWestTile != null) {
-            flipTiles(northWestTile, board[row][column]);
+        for (PlayerTile tile: validTiles(row, column, player)) {
+            if (tile != null) {
+                flipTiles(board[row][column], tile);
+            }
         }
     }
 
@@ -502,30 +267,11 @@ public class ReversiBoard implements Board {
      * @return Boolean whether the player can make a turn or not
      */
     // TODO eine Schleife, for each, array mit 8 vektor richtungen, obige 8 methoden weg, enum für jede richtung?
-    boolean possibleTurn(int row, int column, Player player) {
-        // Checking if a tiles exists for each direction
-        boolean hasNorthTile = (northDirection(row, column, player) != null);
-        boolean hasNorthEastTile =
-                (northEastDirection(row, column, player) != null);
-        boolean hasEastTile = (eastDirection(row, column, player) != null);
-        boolean hasSouthEastTile =
-                (southEastDirection(row, column, player) != null);
-        boolean hasSouthTile = (southDirection(row, column, player) != null);
-        boolean hasSouthWestTile =
-                (southWestDirection(row, column, player) != null);
-        boolean hasWestTile = (westDirection(row, column, player) != null);
-        boolean hasNorthWestTile =
-                (northWestDirection(row, column, player) != null);
-        // Does any player tile exists in any direction and is the field empty?
-        if ((hasNorthTile || hasNorthEastTile || hasEastTile
-                || hasSouthEastTile || hasSouthTile || hasSouthWestTile
-                || hasWestTile || hasNorthWestTile)
-                && getSlot(row, column) == null) {
-            return true;
-        }
-        return false;
+    public boolean possibleTurn(int row, int column, Player player) {
+        return validTiles(row, column, player)[0] != null;
     }
 
+    // TODO NICHT MEHR SICHERGESTELLT DASS KLEINERER WERT ZUERST KOMMT! IN DER METHODE SICHERSTELLEN!
     /**
      * This method flips all tiles between two given tiles. This method
      * supposes that the two given tiles are from the same player and between
