@@ -25,8 +25,9 @@ public final class Shell {
         // Loop iteration variable needed to quit the loop.
         boolean quit = false;
         ReversiBoard board = new ReversiBoard();
+        /*
         board.setLevel(3);
-        board = board.move(5,4);/*
+        board = board.move(5,4);
         System.out.println(board);
         board.getBoard()[3][5] = new PlayerTile(3,5, Player.Computer);
         board.flipAllTiles(3,5, Player.Computer);
@@ -37,10 +38,10 @@ public final class Shell {
         board.getBoard()[5][2] = new PlayerTile(5,2, Player.Computer);
         board.flipAllTiles(5,2, Player.Computer);
         System.out.println(board);
-        System.out.println(board.score());*/
-        board = board.machineMove();
+        System.out.println(board.score());
+        board = board.machineMove();*/
 
-        /*
+
         // Main loop to get user input and execute it.
         while (!quit) {
             System.out.print("othello> ");
@@ -113,7 +114,7 @@ public final class Shell {
                     printError("Invalid command");
                 }
             }
-        }*/
+        }
     }
 
     /**

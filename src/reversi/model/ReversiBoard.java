@@ -551,13 +551,14 @@ public class ReversiBoard implements Board {
 
         for (ReversiBoard board1: children) {
             if (board1 != null) {
-                System.out.println(board1.score);
+                System.out.println(board1.score());
                 for (ReversiBoard board2: board1.children) {
                     if (board2 != null) {
-                        System.out.println("\t" + board2.score);
+                        System.out.println("\t" + board2.score());
                         for (ReversiBoard board3: board2.children) {
                             if (board3 != null) {
-                                System.out.println("\t\t" + board3.score);
+                                System.out.println("\t\t" + board3.score());
+                                System.out.println(board3);
                             }
                         }
                     }
