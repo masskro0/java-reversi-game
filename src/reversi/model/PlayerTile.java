@@ -29,7 +29,8 @@ public class PlayerTile implements Cloneable {
      * @param column Column index on the board.
      * @param player Can be Human or Computer.
      */
-    PlayerTile(final int row, final int column, final Player player) {
+    // TODO private
+    public PlayerTile(final int row, final int column, final Player player) {
         this.row = row;
         this.column = column;
         this.player = player;

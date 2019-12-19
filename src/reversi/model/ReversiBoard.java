@@ -108,7 +108,8 @@ public class ReversiBoard implements Board {
      * the ReversiBoard class
      * @return board as two dimensional array
      */
-    private PlayerTile[][] getBoard() {
+    // TODO private
+    public PlayerTile[][] getBoard() {
         return board;
     }
 
@@ -137,9 +138,11 @@ public class ReversiBoard implements Board {
     /**
      * This method calculates and returns the overall score of this board. It
      * calculates the scoreT, scoreM and scoreP to get the overall score.
+     *
      * @return score value of this board.
      */
-    double score() {
+    // TODO private
+    public double score() {
         int tScoreComputer = 0;
         int tScoreHuman = 0;
         int mScoreComputer = 0;
@@ -162,9 +165,11 @@ public class ReversiBoard implements Board {
                 // Get the necessary infos for mScore of all players
                 if (possibleTurn(i, j, Player.Human)) {
                     mScoreHuman++;
+                    //System.out.println(possibleTurn(i,j,Player.Human) + " (" + (i+1) + "," + (j+1) + ")" + " Human");
                 }
                 if (possibleTurn(i, j, Player.Computer)) {
                     mScoreComputer++;
+                    //System.out.println(possibleTurn(i,j,Player.Computer) + " (" + (i+1) + "," + (j+1) + ")" + " Computer");
                 }
             }
         }
@@ -177,36 +182,19 @@ public class ReversiBoard implements Board {
         return scoreT + scoreM + scoreP;
     }
 
-    // TODO da muss ne bessere lösung her und Doku
     private int countEmptyFieldsAroundTile(int row, int column) {
         int counter = 0;
-        if (row > 0 && getSlot(row - 1, column) == null) {
-            counter++;
-        }
-        if (row > 0 && column < SIZE - 1
-                && getSlot(row - 1, column + 1) == null) {
-            counter++;
-        }
-        if (column < SIZE - 1 && getSlot(row, column + 1) == null) {
-            counter++;
-        }
-        if (row < SIZE - 1 && column < SIZE - 1
-                && getSlot(row + 1, column + 1) == null) {
-            counter++;
-        }
-        if (row < SIZE - 1 && getSlot(row + 1, column) == null) {
-            counter++;
-        }
-        if (column > 0 && row < SIZE - 1
-                && getSlot(row + 1, column - 1) == null) {
-            counter++;
-        }
-        if (column > 0 && getSlot(row, column - 1) == null) {
-            counter++;
-        }
-        if (row > 0 && column > 0
-                && getSlot(row - 1, column - 1) == null) {
-            counter++;
+        for (Directions direction: Directions.values()) {
+            int rowDir = row + direction.row;
+            int columnDir = column + direction.column;
+            boolean validRowDir = (rowDir >= 0 && rowDir < SIZE);
+            boolean validColumnDir = (columnDir >= 0 && columnDir < SIZE);
+            if (!validRowDir || !validColumnDir
+                    || getSlot(rowDir, columnDir) != null) {
+                continue;
+            } else {
+                counter++;
+            }
         }
         return counter;
     }
@@ -219,7 +207,7 @@ public class ReversiBoard implements Board {
             int rowDir = row + direction.row;
             int columnDir = column + direction.column;
             boolean validRowDir = (rowDir >= 0 && rowDir < SIZE);
-            boolean validColumnDir = (columnDir >= 0 && rowDir < SIZE);
+            boolean validColumnDir = (columnDir >= 0 && columnDir < SIZE);
             if (!validRowDir || !validColumnDir
                     || getSlot(rowDir, columnDir) == null
                     || getSlot(rowDir, columnDir) == player) {
@@ -246,13 +234,16 @@ public class ReversiBoard implements Board {
      * all tiles flipped from the enemy. This method ensures that a tile was
      * found and primarily the smaller row index and secondary smaller column
      * index is deligated first before calling the flipTiles method.
+     *
      * @param row Row index of the initial tile
      * @param column Column index of the initial tile
      * @param player Human or Computer, who belongs the initial tile
      */
-    private void flipAllTiles(int row, int column, Player player) {
+    // TODO PRivate
+    public void flipAllTiles(int row, int column, Player player) {
         for (PlayerTile tile: validTiles(row, column, player)) {
             if (tile != null) {
+                //System.out.println(tile.getRow() + " " +  tile.getColumn() + " " + tile.getPlayer());
                 flipTiles(board[row][column], tile);
             }
         }
@@ -261,14 +252,15 @@ public class ReversiBoard implements Board {
     /**
      * This method checks if a player can make a turn. It iterates in all
      * directions from a initial point.
+     *
      * @param row Row index of the initial point
      * @param column Column index of the initial point
      * @param player Player who makes a turn
      * @return Boolean whether the player can make a turn or not
      */
-    // TODO eine Schleife, for each, array mit 8 vektor richtungen, obige 8 methoden weg, enum für jede richtung?
     public boolean possibleTurn(int row, int column, Player player) {
-        return validTiles(row, column, player)[0] != null;
+        return getSlot(row, column) == null
+                && validTiles(row, column, player)[0] != null;
     }
 
     // TODO NICHT MEHR SICHERGESTELLT DASS KLEINERER WERT ZUERST KOMMT! IN DER METHODE SICHERSTELLEN!
@@ -279,35 +271,49 @@ public class ReversiBoard implements Board {
      * primarily a smaller row index and secondly a smaller column index
      * (flipAllTiles method ensures all of these conditions). Only one
      * direction for each method invoke is considered.
+     *
      * @param first smaller player tile
      * @param second bigger player tile
      */
     private void flipTiles(PlayerTile first, PlayerTile second) {
-        if (first.getRow() == second.getRow()) {
+        PlayerTile smaller;
+        PlayerTile bigger;
+        if (first.getRow() < second.getRow()) {
+            smaller = first;
+            bigger = second;
+        } else if (first.getRow() == second.getRow()
+                && first.getColumn() < second.getColumn()) {
+            smaller = first;
+            bigger = second;
+        } else {
+            smaller = second;
+            bigger = first;
+        }
+        if (smaller.getRow() == bigger.getRow()) {
             // Same row
-            for (int i = first.getColumn() + 1; i < second.getColumn(); i++) {
-                board[first.getRow()][i].changeSide();
+            for (int i = smaller.getColumn() + 1; i < bigger.getColumn(); i++) {
+                board[smaller.getRow()][i].changeSide();
             }
-        } else if (first.getColumn() == second.getColumn()) {
+        } else if (smaller.getColumn() == bigger.getColumn()) {
             // Same column
-            for (int i = first.getRow() + 1; i < second.getRow(); i++) {
-                board[i][first.getColumn()].changeSide();
+            for (int i = smaller.getRow() + 1; i < bigger.getRow(); i++) {
+                board[i][smaller.getColumn()].changeSide();
             }
-        } else if (first.getRow() < second.getRow()
-                    && first.getColumn() < second.getColumn()) {
+        } else if (smaller.getRow() < bigger.getRow()
+                    && smaller.getColumn() < bigger.getColumn()) {
             // South-East direction
-            int i = first.getRow() + 1;
-            int j = first.getColumn() + 1;
-            while (i < second.getRow() && j < second.getColumn()) {
+            int i = smaller.getRow() + 1;
+            int j = smaller.getColumn() + 1;
+            while (i < bigger.getRow() && j < bigger.getColumn()) {
                 board[i][j].changeSide();
                 i++;
                 j++;
             }
         } else {
             // South-West direction
-            int i = first.getRow() + 1;
-            int j = first.getColumn() - 1;
-            while (i < second.getRow() && j > second.getColumn()) {
+            int i = smaller.getRow() + 1;
+            int j = smaller.getColumn() - 1;
+            while (i < bigger.getRow() && j > bigger.getColumn()) {
                 board[i][j].changeSide();
                 i++;
                 j--;
@@ -543,6 +549,22 @@ public class ReversiBoard implements Board {
 
         minmaxalg();
 
+        for (ReversiBoard board1: children) {
+            if (board1 != null) {
+                System.out.println(board1.score);
+                for (ReversiBoard board2: board1.children) {
+                    if (board2 != null) {
+                        System.out.println("\t" + board2.score);
+                        for (ReversiBoard board3: board2.children) {
+                            if (board3 != null) {
+                                System.out.println("\t\t" + board3.score);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         ReversiBoard bestBoard = null;
         double bestScore = Integer.MIN_VALUE;
 
@@ -649,7 +671,8 @@ public class ReversiBoard implements Board {
     }
 
     /**
-     * {@inheritDoc}*/
+     * {@inheritDoc}
+     */
     @Override
     public ReversiBoard clone() {
         // Create a new board
@@ -687,7 +710,7 @@ public class ReversiBoard implements Board {
                 }
                 // Leave a whitespace between the fields, except the last one
                 if (j != board[i].length - 1) {
-                    bob.append(" ");
+                    bob.append("  ");
                 }
             }
             // Start a new line for the next row

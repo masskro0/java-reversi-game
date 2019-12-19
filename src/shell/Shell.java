@@ -25,8 +25,20 @@ public final class Shell {
         // Loop iteration variable needed to quit the loop.
         boolean quit = false;
         ReversiBoard board = new ReversiBoard();
+        board.setLevel(3);
+        board = board.move(5,4);/*
         System.out.println(board);
-        System.out.println(board.possibleTurn(0,2, Player.Computer));
+        board.getBoard()[3][5] = new PlayerTile(3,5, Player.Computer);
+        board.flipAllTiles(3,5, Player.Computer);
+        System.out.println(board);
+        board.getBoard()[2][2] = new PlayerTile(2,2, Player.Human);
+        board.flipAllTiles(2,2, Player.Human);
+        System.out.println(board);
+        board.getBoard()[5][2] = new PlayerTile(5,2, Player.Computer);
+        board.flipAllTiles(5,2, Player.Computer);
+        System.out.println(board);
+        System.out.println(board.score());*/
+        board = board.machineMove();
 
         /*
         // Main loop to get user input and execute it.
@@ -205,18 +217,17 @@ public final class Shell {
     }
 
     /**
-     * Prints the winner by comparing the number of player tiles of both
-     * players.
+     * Prints the winner if the game has ended.
      *
      * @param board The current board that needs to be checked.
      */
     private static void printResults(ReversiBoard board) {
-        if (board.gameOver()) {
-            if (board.getNumberOfHumanTiles()
-                    > board.getNumberOfMachineTiles()) {
-                System.out.println("You have won!");
+        Player winner = board.getWinner();
+        if (winner != null && winner != Player.Nobody) {
+            if (winner == Player.Human) {
+                System.out.println("You have won");
             } else {
-                System.out.println("Machine has won.");
+                System.out.println("Machine has won");
             }
         }
     }
