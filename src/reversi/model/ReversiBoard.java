@@ -179,6 +179,8 @@ public class ReversiBoard implements Board {
         double scoreP = (64.0 / (2.0 * occupiedFields)) * (2.5 * pScoreHuman
                         - 3.0 * pScoreComputer);
         this.score = scoreT + scoreM + scoreP;
+        //System.out.println(mScoreComputer + " Comp");
+        //System.out.println(mScoreHuman + " Human");
         return scoreT + scoreM + scoreP;
     }
 
@@ -214,9 +216,13 @@ public class ReversiBoard implements Board {
                 continue;
             }
             while (rowDir >= 0 && rowDir < SIZE && columnDir >= 0
-                    && columnDir < SIZE) {
-                if (getSlot(rowDir, columnDir) == player) {
+                    && columnDir < SIZE && getSlot(rowDir, columnDir) != null) {
+                if (getSlot(rowDir, columnDir) == player
+                        && (Math.abs(rowDir - (row)) > 1
+                        || Math.abs(columnDir - (column)) > 1)
+                 ) {
                     validTiles[counter] = board[rowDir][columnDir];
+                    //System.out.println((rowDir+1) + " " +  (columnDir+1) + " " + player);
                     counter++;
                     break;
                 }
@@ -549,22 +555,23 @@ public class ReversiBoard implements Board {
 
         minmaxalg();
 
+        /*
         for (ReversiBoard board1: children) {
             if (board1 != null) {
-                System.out.println(board1.score());
+                System.out.println(board1.score);
                 for (ReversiBoard board2: board1.children) {
                     if (board2 != null) {
-                        System.out.println("\t" + board2.score());
+                        System.out.println("\t" + board2.score);
                         for (ReversiBoard board3: board2.children) {
                             if (board3 != null) {
-                                System.out.println("\t\t" + board3.score());
-                                System.out.println(board3);
+                                System.out.println("\t\t" + board3.score);
+                                //System.out.println(board3);
                             }
                         }
                     }
                 }
             }
-        }
+        }*/
 
         ReversiBoard bestBoard = null;
         double bestScore = Integer.MIN_VALUE;
