@@ -37,7 +37,7 @@ public class ReversiBoard implements Board {
      * The player who should make the next turn. It is always set as the
      * opposite side of the player who made the previous turn.
      */
-    private Player nextTurn;
+    public Player nextTurn;
 
     /**
      * The current score of this board, calculated with the score method and
@@ -245,8 +245,7 @@ public class ReversiBoard implements Board {
      * @param column Column index of the initial tile
      * @param player Human or Computer, who belongs the initial tile
      */
-    // TODO PRivate
-    public void flipAllTiles(int row, int column, Player player) {
+    private void flipAllTiles(int row, int column, Player player) {
         for (PlayerTile tile: validTiles(row, column, player)) {
             if (tile != null) {
                 //System.out.println(tile.getRow() + " " +  tile.getColumn() + " " + tile.getPlayer());
@@ -398,13 +397,13 @@ public class ReversiBoard implements Board {
      */
     @Override
     public ReversiBoard move(int row, int col) {
-        if (nextTurn != Player.Human) {
+        /*if (nextTurn != Player.Human) {
             throw new IllegalMoveException("Error! Wait for your enemy's "
                     + "turn.");
         } else if (gameState == GameState.OVER) {
             throw new IllegalMoveException("Error! The game is over.");
-        }
-        if (getSlot(row, col) == null && nextTurn == Player.Human
+        }*/
+        if (getSlot(row, col) == null && next() == Player.Human
                 && possibleTurn(row, col, Player.Human)) {
             ReversiBoard newBoard = clone();
             // Add new player tile to the field
@@ -576,11 +575,11 @@ public class ReversiBoard implements Board {
         ReversiBoard bestBoard = null;
         double bestScore = Integer.MIN_VALUE;
 
-        for (ReversiBoard board: children) {
-            if (board != null) {
-                if (board.score > bestScore) {
-                    bestScore = board.score;
-                    bestBoard = board;
+        for (ReversiBoard boardq: children) {
+            if (boardq != null) {
+                if (boardq.score > bestScore) {
+                    bestScore = boardq.score;
+                    bestBoard = boardq;
                 }
             }
         }
@@ -718,7 +717,7 @@ public class ReversiBoard implements Board {
                 }
                 // Leave a whitespace between the fields, except the last one
                 if (j != board[i].length - 1) {
-                    bob.append("  ");
+                    bob.append(" ");
                 }
             }
             // Start a new line for the next row
