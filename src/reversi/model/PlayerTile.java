@@ -5,7 +5,7 @@ package reversi.model;
  * position and an owner.
  */
 
-public class PlayerTile implements Cloneable {
+class PlayerTile implements Cloneable {
 
     /**
      * Defines the row index of this tile on the Reversi board.
@@ -29,8 +29,7 @@ public class PlayerTile implements Cloneable {
      * @param column Column index on the board.
      * @param player Can be Human or Computer.
      */
-    // TODO private
-    public PlayerTile(final int row, final int column, final Player player) {
+    PlayerTile(final int row, final int column, final Player player) {
         this.row = row;
         this.column = column;
         this.player = player;
@@ -41,7 +40,7 @@ public class PlayerTile implements Cloneable {
      *
      * @return Row index of this tile.
      */
-    public int getRow() {
+    int getRow() {
         return row;
     }
 
@@ -50,7 +49,7 @@ public class PlayerTile implements Cloneable {
      *
      * @return Column index of this tile.
      */
-    public int getColumn() {
+    int getColumn() {
         return column;
     }
 
@@ -59,14 +58,14 @@ public class PlayerTile implements Cloneable {
      *
      * @return Can be Human or Computer.
      */
-    public Player getPlayer() {
+    Player getPlayer() {
         return player;
     }
 
     /**
      * Change the owner of this tile.
      */
-    public void changeSide() {
+    void changeSide() {
         if (player == Player.Computer) {
             player = Player.Human;
         } else {

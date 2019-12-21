@@ -25,41 +25,6 @@ public final class Shell {
         // Loop iteration variable needed to quit the loop.
         boolean quit = false;
         ReversiBoard board = new ReversiBoard();
-        /*
-        board = move(6,5, board);
-        board = move(5, 6, board);
-        board = move(6,7, board);
-        board = move(8,7,board);
-        board = move(3,4,board);
-        board = move(7,8,board);
-        board = move(5,8,board);
-        board = move(7,6,board);
-        board = move(7,5,board);
-        board = move(5,7,board);
-        board = move(8,5,board);
-        board = move(3,7,board);
-        board = move(3,5,board);
-        board = move(2,7,board);
-        board = move(2,8,board);
-        board = move(2,6,board);
-        board = move(2,5,board);
-        board = move(3,3,board);
-        board = move(5,3,board);
-        board = move(6,3,board);
-        board = move(8,2,board);
-        board = move(6,2,board);
-        board = move(5,2,board);
-        board = move(2,3,board);
-        board = move(1,4,board);
-        board = move(1,7, board);
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        board = board.move(6,2);
-        //System.out.println(board);*/
-
 
         // Main loop to get user input and execute it.
         while (!quit) {
@@ -227,11 +192,11 @@ public final class Shell {
                     return newBoardHuman;
                 }
             } else {
-                printError("This is not a valid move");
+                printError("Invalid move at (" + row + ", " + column + ").");
                 return board;
             }
         } else {
-            System.out.println("You have to miss a turn.");
+            System.out.println("Human has to miss a turn");
             return board.machineMove();
         }
     }
@@ -243,11 +208,13 @@ public final class Shell {
      */
     private static void printResults(ReversiBoard board) {
         Player winner = board.getWinner();
-        if (winner != null && winner != Player.Nobody) {
+        if (winner != null) {
             if (winner == Player.Human) {
                 System.out.println("You have won!");
-            } else {
+            } else if (winner == Player.Computer){
                 System.out.println("Machine has won.");
+            } else {
+                System.out.println("Tie game!");
             }
         }
     }
