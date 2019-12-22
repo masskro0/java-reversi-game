@@ -35,20 +35,10 @@ public class ReversiBoard implements Board {
     private Player nextTurn;
 
     /**
-     * The local or global score of this board.
-     */
-    private double score;
-
-    /**
      * A two-dimensional matrix containing score values for each field of a
      * Reversi board.
      */
     private final int[][] scoreBoard;
-
-    /**
-     * All possible next moves of this board.
-     */
-    private ReversiBoard[] children;
 
     /**
      * Creates a new game with a new Reversi board. This constructor lets the
@@ -60,7 +50,6 @@ public class ReversiBoard implements Board {
         nextTurn = firstPlayer;
         initializeBoard();
         gameState = GameState.RUNNING;
-        children = new ReversiBoard[SIZE * SIZE - 4];
         level = 3;
         scoreBoard = initScoreBoard();
     }
@@ -78,7 +67,6 @@ public class ReversiBoard implements Board {
         nextTurn = firstPlayer;
         initializeBoard();
         gameState = GameState.RUNNING;
-        children = new ReversiBoard[SIZE * SIZE - 4];
         setLevel(oldBoard.level);
         scoreBoard = initScoreBoard();
     }
@@ -162,7 +150,6 @@ public class ReversiBoard implements Board {
                         - 4.0 * mScoreHuman);
         double scoreP = (64.0 / (2.0 * occupiedFields)) * (2.5 * pScoreHuman
                         - 3.0 * pScoreComputer);
-        score = scoreT + scoreM + scoreP;
         return scoreT + scoreM + scoreP;
     }
 
@@ -278,60 +265,15 @@ public class ReversiBoard implements Board {
     }
 
     /**
-     * Creates a tree of Reversi boards and calculates the best move for a
-     * certain level. A higher level results in a deeper tree. This algorithm
-     * takes the best computer move and the worst human move, decided by
-     * global scores. Leaves don't have children and have only a local score.
-     *
-     * @return ReversiBoard object with the best possible move executed.
-     */
-    private ReversiBoard minimaxAlgorithm() {
-        if (children[0] == null) {
-            score();
-            return this;
-        } else {
-            if (next() == Player.Computer) {
-                double maxScore = Integer.MIN_VALUE;
-                ReversiBoard bestBoard = null;
-                for (ReversiBoard child: children) {
-                    if (child == null) {
-                        break;
-                    }
-                    child.minimaxAlgorithm();
-                    if (maxScore < child.score) {
-                        maxScore = child.score;
-                        bestBoard = child;
-                    }
-                }
-                score = score() + maxScore;
-                return bestBoard;
-            } else {
-                double minScore = Integer.MAX_VALUE;
-                ReversiBoard worstBoard = null;
-                for (ReversiBoard child: children) {
-                    if (child == null) {
-                        break;
-                    }
-                    child.minimaxAlgorithm();
-                    if (minScore > child.score) {
-                        minScore = child.score;
-                        worstBoard = child;
-                    }
-                }
-                score = score() + minScore;
-                return worstBoard;
-            }
-        }
-    }
-
-    /**
-     * Captures all possible move for a specific player for {@code this} and
-     * stores them in a ReversiBoard array as children. This method is
-     * recursively called, until the depth of the tree is as big as the level.
+     * Captures all possible moves of a specific player for a Reversi board
+     * of a TreeNode and stores them in a TreeNode array as children. This
+     * method is recursively called, until the depth of the tree is as big as
+     * the level.
      *
      * @param depth The actual depth of the tree.
      */
-    private void setChildren(int depth) {
+    private void setChildren(TreeNode node, int depth) {
+        TreeNode[] children = new TreeNode[SIZE * SIZE - 4];
         if (depth < level) {
             int counter = 0;
             Player nextTurn = next();
@@ -341,7 +283,6 @@ public class ReversiBoard implements Board {
                 for (int j = 0; j < Board.SIZE; j++) {
                     if (validMove(i, j, nextTurn)) {
                         ReversiBoard newBoard = clone();
-                        newBoard.children = new ReversiBoard[SIZE * SIZE - 4];
                         newBoard.field[i][j] = new PlayerTile(i, j,
                                 nextTurn);
                         newBoard.validTiles(i, j, nextTurn, true);
@@ -350,20 +291,23 @@ public class ReversiBoard implements Board {
                         } else {
                             newBoard.nextTurn = Player.Human;
                         }
-                        children[counter] = newBoard;
+                        TreeNode child = new TreeNode(newBoard, level);
+                        children[counter] = child;
                         counter++;
                     }
                 }
             }
             if (counter != 0) {
                 ++depth;
-                for (ReversiBoard child: children) {
+                for (TreeNode child: children) {
                     if (child != null) {
-                        child.setChildren(depth);
+                        child.getReversiBoard().setChildren(child, depth);
                     }
                 }
+                node.setChildren(children);
             }
         }
+        node.setLocalScore(score());
     }
 
     /**
@@ -423,8 +367,9 @@ public class ReversiBoard implements Board {
      */
     @Override
     public ReversiBoard machineMove() throws IllegalMoveException {
-        setChildren(0);
-        ReversiBoard bestBoard = minimaxAlgorithm();
+        TreeNode root = new TreeNode(this, level);
+        setChildren(root, 0);
+        ReversiBoard bestBoard = root.minimaxAlgorithm();
         if (bestBoard != null) {
             return bestBoard;
         } else {
