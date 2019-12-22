@@ -7,6 +7,12 @@ package reversi.model;
  * interface Board.
  */
 public class IllegalMoveException extends RuntimeException {
+
+    /**
+     * Throws a new Runtime Exception with a given error message.
+     *
+     * @param errorMessage A message of why something went wrong.
+     */
     public IllegalMoveException(final String errorMessage) {
         super(errorMessage);
     }

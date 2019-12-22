@@ -1,6 +1,7 @@
 package shell;
 
-import reversi.model.*;
+import reversi.model.ReversiBoard;
+import reversi.model.Player;
 
 import java.util.Scanner;
 
@@ -76,7 +77,6 @@ public final class Shell {
                     printError("You have to enter an integer");
                 }
             } else {
-
                 // Execute single commands.
                 switch (command) {
                 case 'N':       // NEW game will be created.
@@ -138,13 +138,12 @@ public final class Shell {
     /**
      * Concatenates a given message and prints an error message.
      *
-     * @param msg This message parts explains why an error occured.
+     * @param msg This message parts explains why an error occurred.
      */
     private static void printError(String msg) {
         System.err.println("Error! " + msg);
     }
 
-    // TODO: else: Runtime error mit exception werfen aber wie
     /**
      * Executes a human move and afterwards, if possible, a machine move, and
      * returns the new board.
@@ -167,13 +166,6 @@ public final class Shell {
         row--;
         column--;
 
-        // Indices within board dimensions?
-        if (row < 0 || row >= Board.SIZE || column < 0
-                || column >= Board.SIZE) {
-            printError("Row and column indices must be in the range between 1 "
-                    + "and " + Board.SIZE);
-            return board;
-        }
         if (board.next() == Player.Human) {
             ReversiBoard newBoardHuman = board.move(row, column);
             if (newBoardHuman != null) {
@@ -192,7 +184,8 @@ public final class Shell {
                     return newBoardHuman;
                 }
             } else {
-                printError("Invalid move at (" + row + ", " + column + ").");
+                printError("Invalid move at (" + (row + 1) + ", "
+                        + (column + 1) + ").");
                 return board;
             }
         } else {
@@ -211,7 +204,7 @@ public final class Shell {
         if (winner != null) {
             if (winner == Player.Human) {
                 System.out.println("You have won!");
-            } else if (winner == Player.Computer){
+            } else if (winner == Player.Computer) {
                 System.out.println("Machine has won.");
             } else {
                 System.out.println("Tie game!");

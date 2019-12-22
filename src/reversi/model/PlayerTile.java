@@ -78,11 +78,10 @@ class PlayerTile implements Cloneable {
      *
      * @return A clone.
      */
+    @Override
     public PlayerTile clone() {
-        PlayerTile cloneTile;
         try {
-            cloneTile = (PlayerTile) super.clone();
-            return cloneTile;
+            return (PlayerTile) super.clone();
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
         }
