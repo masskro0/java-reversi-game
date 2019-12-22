@@ -136,8 +136,8 @@ public class ReversiBoard implements Board {
         int mScoreHuman = 0;
         int pScoreHuman = 0;
         int pScoreComputer = 0;
-        double occupiedFields = getNumberOfHumanTiles() * 1.0
-                + getNumberOfMachineTiles() * 1.0;
+        int occupiedFields = getNumberOfHumanTiles()
+                + getNumberOfMachineTiles();
 
         // Iterate over the board to get the values for score calculation.
         for (int i = 0; i < SIZE; i++) {
@@ -217,7 +217,6 @@ public class ReversiBoard implements Board {
             }
             while (validRowIndex && validColumnIndex
                     && getSlot(rowDir, columnDir) != null) {
-
                 // Tile belongs to the same player and is not direct neighbour?
                 if (getSlot(rowDir, columnDir) == player
                         && (Math.abs(rowDir - (row)) > 1
@@ -286,7 +285,7 @@ public class ReversiBoard implements Board {
      *
      * @return ReversiBoard object with the best possible move executed.
      */
-    private ReversiBoard minimaxalg() {
+    private ReversiBoard minimaxAlgorithm() {
         if (children[0] == null) {
             score();
             return this;
@@ -298,7 +297,7 @@ public class ReversiBoard implements Board {
                     if (child == null) {
                         break;
                     }
-                    child.minimaxalg();
+                    child.minimaxAlgorithm();
                     if (maxScore < child.score) {
                         maxScore = child.score;
                         bestBoard = child;
@@ -313,7 +312,7 @@ public class ReversiBoard implements Board {
                     if (child == null) {
                         break;
                     }
-                    child.minimaxalg();
+                    child.minimaxAlgorithm();
                     if (minScore > child.score) {
                         minScore = child.score;
                         worstBoard = child;
@@ -402,11 +401,7 @@ public class ReversiBoard implements Board {
      * {@inheritDoc}
      */
     @Override
-    public ReversiBoard move(int row, int col) {
-        if (gameState == GameState.OVER) {
-            throw new IllegalMoveException("Error! The game is already over.");
-        }
-
+    public ReversiBoard move(int row, int col) throws IllegalMoveException {
         // Indices within board dimensions?
         if (row < 0 || row >= Board.SIZE || col < 0 || col >= Board.SIZE) {
             throw new IllegalArgumentException("Row and column indices must be"
@@ -427,31 +422,9 @@ public class ReversiBoard implements Board {
      * {@inheritDoc}
      */
     @Override
-    public ReversiBoard machineMove() {
-        if (gameState == GameState.OVER) {
-            throw new IllegalMoveException("Error! The game is already over.");
-        }
+    public ReversiBoard machineMove() throws IllegalMoveException {
         setChildren(0);
-        ReversiBoard bestBoard = minimaxalg();
-/*
-        // TODO FOR DEBUGGING -> DELETE ME
-        for (ReversiBoard board1: children) {
-            if (board1 != null) {
-                System.out.println(board1.score);
-                for (ReversiBoard board2: board1.children) {
-                    if (board2 != null) {
-                        System.out.println("\t" + board2.score);
-                        for (ReversiBoard board3: board2.children) {
-                            if (board3 != null) {
-                                System.out.println("\t\t" + board3.score);
-                                //System.out.println(board3);
-                            }
-                        }
-                    }
-                }
-            }
-        }*/
-
+        ReversiBoard bestBoard = minimaxAlgorithm();
         if (bestBoard != null) {
             return bestBoard;
         } else {
@@ -459,7 +432,6 @@ public class ReversiBoard implements Board {
             return this;
         }
     }
-
 
     /**
      * {@inheritDoc}
