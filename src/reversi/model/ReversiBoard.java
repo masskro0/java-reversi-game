@@ -352,7 +352,7 @@ public class ReversiBoard implements Board {
                     + " in the range between 1 and " + Board.SIZE);
         }
         if (gameState == GameState.OVER || next() != Player.Human) {
-            throw new IllegalMoveException("This is not a valid move!");
+            throw new IllegalMoveException("It's not your turn!");
         } else {
             if (getSlot(row, col) == null && next() == Player.Human
                     && validMove(row, col, Player.Human)) {
@@ -373,7 +373,7 @@ public class ReversiBoard implements Board {
     @Override
     public ReversiBoard machineMove() {
         if (gameState == GameState.OVER || next() != Player.Computer) {
-            throw new IllegalMoveException("Machine made an invalid move.");
+            throw new IllegalMoveException("Machine made a move twice.");
         } else {
             TreeNode root = new TreeNode(this, level);
             setChildren(root, 0);

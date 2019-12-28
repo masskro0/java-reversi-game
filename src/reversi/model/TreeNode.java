@@ -1,5 +1,9 @@
 package reversi.model;
 
+/**
+ * A node in the minimax algorithm tree. It knows its current board state,
+ * children, local and global score.
+ */
 public class TreeNode {
 
     /**
@@ -73,7 +77,7 @@ public class TreeNode {
      * takes the best computer move and the worst human move, decided by
      * global scores. Leaves don't have children and have only a local score.
      *
-     * @return ReversiBoard object with the best possible move executed.
+     * @return ReversiBoard object with a executed move.
      */
     ReversiBoard minimaxAlgorithm() {
         if (children[0] == null) {

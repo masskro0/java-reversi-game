@@ -103,7 +103,7 @@ public final class Shell {
 
     /**
      * Sets the level of the current Reversi board and checks whether the
-     * user entered a valid level value.
+     * user entered a valid level value or not.
      *
      * @param board The current board of a game session.
      * @param level A level value entered by the user.
