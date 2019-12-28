@@ -345,19 +345,24 @@ public class ReversiBoard implements Board {
      * {@inheritDoc}
      */
     @Override
-    public ReversiBoard move(int row, int col) throws IllegalMoveException {
+    public ReversiBoard move(int row, int col) {
         // Indices within board dimensions?
         if (row < 0 || row >= Board.SIZE || col < 0 || col >= Board.SIZE) {
             throw new IllegalArgumentException("Row and column indices must be"
                     + " in the range between 1 and " + Board.SIZE);
         }
-        if (getSlot(row, col) == null && next() == Player.Human
-                && validMove(row, col, Player.Human)) {
-            ReversiBoard newBoard = clone();
-            newBoard.field[row][col] = new PlayerTile(row, col, Player.Human);
-            newBoard.validTiles(row, col, Player.Human, true);
-            newBoard.nextTurn = Player.Computer;
-            return newBoard;
+        if (gameState == GameState.OVER || next() != Player.Human) {
+            throw new IllegalMoveException("This is not a valid move!");
+        } else {
+            if (getSlot(row, col) == null && next() == Player.Human
+                    && validMove(row, col, Player.Human)) {
+                ReversiBoard newBoard = clone();
+                newBoard.field[row][col]
+                        = new PlayerTile(row, col, Player.Human);
+                newBoard.validTiles(row, col, Player.Human, true);
+                newBoard.nextTurn = Player.Computer;
+                return newBoard;
+            }
         }
         return null;
     }
@@ -366,15 +371,19 @@ public class ReversiBoard implements Board {
      * {@inheritDoc}
      */
     @Override
-    public ReversiBoard machineMove() throws IllegalMoveException {
-        TreeNode root = new TreeNode(this, level);
-        setChildren(root, 0);
-        ReversiBoard bestBoard = root.minimaxAlgorithm();
-        if (bestBoard != null) {
-            return bestBoard;
+    public ReversiBoard machineMove() {
+        if (gameState == GameState.OVER || next() != Player.Computer) {
+            throw new IllegalMoveException("Machine made an invalid move.");
         } else {
-            nextTurn = Player.Human;
-            return this;
+            TreeNode root = new TreeNode(this, level);
+            setChildren(root, 0);
+            ReversiBoard bestBoard = root.minimaxAlgorithm();
+            if (bestBoard != null) {
+                return bestBoard;
+            } else {
+                nextTurn = Player.Human;
+                return this;
+            }
         }
     }
 
