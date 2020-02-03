@@ -1,4 +1,4 @@
-package reversi.model;
+package model;
 
 /**
  * An enum for all eight directions. Each direction contains a (y, x) or

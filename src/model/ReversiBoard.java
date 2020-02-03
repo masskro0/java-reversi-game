@@ -1,4 +1,4 @@
-package reversi.model;
+package model;
 
 /**
  * This class implements the interface Board and represents a Reversi board
@@ -168,7 +168,7 @@ public class ReversiBoard implements Board {
             boolean validRowIndex = (rowDir >= 0 && rowDir < SIZE);
             boolean validColumnIndex = (columnDir >= 0 && columnDir < SIZE);
             if (validRowIndex && validColumnIndex
-                    && getSlot(rowDir, columnDir) == null) {
+                    && getSlot(rowDir, columnDir) == Player.Nobody) {
                 counter++;
             }
         }
@@ -198,12 +198,12 @@ public class ReversiBoard implements Board {
             boolean validRowIndex = (rowDir >= 0 && rowDir < SIZE);
             boolean validColumnIndex = (columnDir >= 0 && columnDir < SIZE);
             if (!validRowIndex || !validColumnIndex
-                    || getSlot(rowDir, columnDir) == null
+                    || getSlot(rowDir, columnDir) == Player.Nobody
                     || getSlot(rowDir, columnDir) == player) {
                 continue;
             }
             while (validRowIndex && validColumnIndex
-                    && getSlot(rowDir, columnDir) != null) {
+                    && getSlot(rowDir, columnDir) != Player.Nobody) {
                 // Tile belongs to the same player and is not direct neighbour?
                 if (getSlot(rowDir, columnDir) == player
                         && (Math.abs(rowDir - (row)) > 1
@@ -243,7 +243,7 @@ public class ReversiBoard implements Board {
      * @return {@code true} if and only if the move is valid.
      */
     private boolean validMove(int row, int column, Player player) {
-        return getSlot(row, column) == null
+        return getSlot(row, column) == Player.Nobody
                 && validTiles(row, column, player, false)[0] != null;
     }
 
@@ -354,7 +354,7 @@ public class ReversiBoard implements Board {
         if (gameState == GameState.OVER || next() != Player.Human) {
             throw new IllegalMoveException("It's not your turn!");
         } else {
-            if (getSlot(row, col) == null && next() == Player.Human
+            if (getSlot(row, col) == Player.Nobody && next() == Player.Human
                     && validMove(row, col, Player.Human)) {
                 ReversiBoard newBoard = clone();
                 newBoard.field[row][col]
@@ -462,8 +462,9 @@ public class ReversiBoard implements Board {
     public Player getSlot(final int row, final int col) {
         if (field[row][col] != null) {
             return field[row][col].getPlayer();
+        } else {
+            return Player.Nobody;
         }
-        return null;
     }
 
     /**

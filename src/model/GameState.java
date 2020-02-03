@@ -1,4 +1,4 @@
-package reversi.model;
+package model;
 
 /**
  * This enum represents the game state of the board and controls whether

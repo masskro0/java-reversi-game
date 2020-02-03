@@ -1,7 +1,7 @@
-package shell;
+package view_controller;
 
-import reversi.model.ReversiBoard;
-import reversi.model.Player;
+import model.ReversiBoard;
+import model.Player;
 
 import java.util.Scanner;
 

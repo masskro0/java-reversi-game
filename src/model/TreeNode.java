@@ -1,4 +1,4 @@
-package reversi.model;
+package model;
 
 /**
  * A node in the minimax algorithm tree. It knows its current board state,

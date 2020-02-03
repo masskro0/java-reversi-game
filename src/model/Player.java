@@ -1,4 +1,4 @@
-package reversi.model;
+package model;
 
 /**
  * This enum represents the three player types, which defines who can make the

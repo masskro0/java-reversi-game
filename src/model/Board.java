@@ -1,4 +1,4 @@
-package reversi.model;
+package model;
 
 /**
  * Interface for a Reversi game, also known as Othello.

@@ -1,4 +1,4 @@
-package reversi.model;
+package model;
 
 /**
  * The IllegalMoveException is a RunTimeException which is thrown when a player

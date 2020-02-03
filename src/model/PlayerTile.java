@@ -1,4 +1,4 @@
-package reversi.model;
+package model;
 
 /**
  * This class represents one player tile on the Reversi board. It has a defined
