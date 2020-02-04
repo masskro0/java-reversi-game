@@ -1,20 +1,20 @@
 package view_controller;
 
+import model.Board;
+import model.ReversiBoard;
+
 import javax.swing.*;
 
 public class StartGui {
 
-    public static void main(String[] args) {
-        Runnable r = () -> {
-            ReversiGui reversiGui = new ReversiGui();
+    private StartGui() {
+    }
 
-            JFrame frame = new JFrame("Reversi");
-            frame.setSize(500, 500);
-            frame.getContentPane().add(reversiGui.getGui());
-            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            frame.setLocationByPlatform(true);
-            frame.setVisible(true);
-        };
-        SwingUtilities.invokeLater(r);
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            Board model = new ReversiBoard();
+            JFrame mainFrame = new View(model);
+            mainFrame.setVisible(true);
+        });
     }
 }

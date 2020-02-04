@@ -84,7 +84,7 @@ public class TreeNode {
             globalScore = localScore;
             return reversiBoard;
         } else {
-            if (reversiBoard.next() == Player.Computer) {
+            if (reversiBoard.next() == Player.COMPUTER) {
                 double maxScore = Integer.MIN_VALUE;
                 ReversiBoard bestBoard = null;
                 for (TreeNode child: children) {

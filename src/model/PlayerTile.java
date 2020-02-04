@@ -66,10 +66,10 @@ class PlayerTile implements Cloneable {
      * Change the owner of this tile.
      */
     void changeSide() {
-        if (player == Player.Computer) {
-            player = Player.Human;
+        if (player == Player.COMPUTER) {
+            player = Player.HUMAN;
         } else {
-            player = Player.Computer;
+            player = Player.COMPUTER;
         }
     }
 

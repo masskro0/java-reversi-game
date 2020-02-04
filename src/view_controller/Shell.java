@@ -129,7 +129,7 @@ public final class Shell {
      */
     private static ReversiBoard createNewGame(ReversiBoard board) {
         board = new ReversiBoard(board, board.getFirstPlayer());
-        if (board.getFirstPlayer() == Player.Computer) {
+        if (board.getFirstPlayer() == Player.COMPUTER) {
             board = board.machineMove();
         }
         return board;
@@ -166,14 +166,14 @@ public final class Shell {
         row--;
         column--;
 
-        if (board.next() == Player.Human) {
+        if (board.next() == Player.HUMAN) {
             ReversiBoard newBoardHuman = board.move(row, column);
             if (newBoardHuman != null) {
                 if (newBoardHuman.gameOver()) {
                     printResults(newBoardHuman);
                     return newBoardHuman;
                 }
-                if (newBoardHuman.next() == Player.Computer) {
+                if (newBoardHuman.next() == Player.COMPUTER) {
                     ReversiBoard newBoardComp = newBoardHuman.machineMove();
                     if (newBoardComp.gameOver()) {
                         printResults(newBoardComp);
@@ -202,9 +202,9 @@ public final class Shell {
     private static void printResults(ReversiBoard board) {
         Player winner = board.getWinner();
         if (winner != null) {
-            if (winner == Player.Human) {
+            if (winner == Player.HUMAN) {
                 System.out.println("You have won!");
-            } else if (winner == Player.Computer) {
+            } else if (winner == Player.COMPUTER) {
                 System.out.println("Machine has won.");
             } else {
                 System.out.println("Tie game!");
@@ -219,11 +219,11 @@ public final class Shell {
      * @return A new game/board with the opposite first player.
      */
     private static ReversiBoard switchPlayer(ReversiBoard board) {
-        if (board.getFirstPlayer() == Player.Human) {
-            ReversiBoard newBoard = new ReversiBoard(board, Player.Computer);
+        if (board.getFirstPlayer() == Player.HUMAN) {
+            ReversiBoard newBoard = new ReversiBoard(board, Player.COMPUTER);
             return createNewGame(newBoard);
         } else {
-            ReversiBoard newBoard = new ReversiBoard(board, Player.Human);
+            ReversiBoard newBoard = new ReversiBoard(board, Player.HUMAN);
             return createNewGame(newBoard);
         }
     }

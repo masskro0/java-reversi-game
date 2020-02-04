@@ -46,7 +46,7 @@ public class ReversiBoard implements Board {
      */
     public ReversiBoard() {
         field = new PlayerTile[SIZE][SIZE];
-        firstPlayer = Player.Human;
+        firstPlayer = Player.HUMAN;
         nextTurn = firstPlayer;
         initializeBoard();
         gameState = GameState.RUNNING;
@@ -96,16 +96,16 @@ public class ReversiBoard implements Board {
     private void initializeBoard() {
         int i = SIZE / 2;
         int j = SIZE / 2 - 1;
-        if (firstPlayer == Player.Human) {
-            field[i][j] = new PlayerTile(i, j, Player.Human);
-            field[j][i] = new PlayerTile(j, i, Player.Human);
-            field[j][j] = new PlayerTile(j, j, Player.Computer);
-            field[i][i] = new PlayerTile(i, i, Player.Computer);
+        if (firstPlayer == Player.HUMAN) {
+            field[i][j] = new PlayerTile(i, j, Player.HUMAN);
+            field[j][i] = new PlayerTile(j, i, Player.HUMAN);
+            field[j][j] = new PlayerTile(j, j, Player.COMPUTER);
+            field[i][i] = new PlayerTile(i, i, Player.COMPUTER);
         } else {
-            field[i][j] = new PlayerTile(i, j, Player.Computer);
-            field[j][i] = new PlayerTile(j, i, Player.Computer);
-            field[j][j] = new PlayerTile(j, j, Player.Human);
-            field[i][i] = new PlayerTile(i, i, Player.Human);
+            field[i][j] = new PlayerTile(i, j, Player.COMPUTER);
+            field[j][i] = new PlayerTile(j, i, Player.COMPUTER);
+            field[j][j] = new PlayerTile(j, j, Player.HUMAN);
+            field[i][i] = new PlayerTile(i, i, Player.HUMAN);
         }
     }
 
@@ -130,17 +130,17 @@ public class ReversiBoard implements Board {
         // Iterate over the board to get the values for score calculation.
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
-                if (getSlot(i, j) == Player.Human) {
+                if (getSlot(i, j) == Player.HUMAN) {
                     tScoreHuman += scoreBoard[i][j];
                     pScoreHuman += countEmptyFieldsAroundTile(i, j);
-                } else if (getSlot(i, j) == Player.Computer) {
+                } else if (getSlot(i, j) == Player.COMPUTER) {
                     tScoreComputer += scoreBoard[i][j];
                     pScoreComputer += countEmptyFieldsAroundTile(i, j);
                 }
-                if (validMove(i, j, Player.Human)) {
+                if (validMove(i, j, Player.HUMAN)) {
                     mScoreHuman++;
                 }
-                if (validMove(i, j, Player.Computer)) {
+                if (validMove(i, j, Player.COMPUTER)) {
                     mScoreComputer++;
                 }
             }
@@ -168,7 +168,7 @@ public class ReversiBoard implements Board {
             boolean validRowIndex = (rowDir >= 0 && rowDir < SIZE);
             boolean validColumnIndex = (columnDir >= 0 && columnDir < SIZE);
             if (validRowIndex && validColumnIndex
-                    && getSlot(rowDir, columnDir) == Player.Nobody) {
+                    && getSlot(rowDir, columnDir) == Player.NOBODY) {
                 counter++;
             }
         }
@@ -198,12 +198,12 @@ public class ReversiBoard implements Board {
             boolean validRowIndex = (rowDir >= 0 && rowDir < SIZE);
             boolean validColumnIndex = (columnDir >= 0 && columnDir < SIZE);
             if (!validRowIndex || !validColumnIndex
-                    || getSlot(rowDir, columnDir) == Player.Nobody
+                    || getSlot(rowDir, columnDir) == Player.NOBODY
                     || getSlot(rowDir, columnDir) == player) {
                 continue;
             }
             while (validRowIndex && validColumnIndex
-                    && getSlot(rowDir, columnDir) != Player.Nobody) {
+                    && getSlot(rowDir, columnDir) != Player.NOBODY) {
                 // Tile belongs to the same player and is not direct neighbour?
                 if (getSlot(rowDir, columnDir) == player
                         && (Math.abs(rowDir - (row)) > 1
@@ -243,7 +243,7 @@ public class ReversiBoard implements Board {
      * @return {@code true} if and only if the move is valid.
      */
     private boolean validMove(int row, int column, Player player) {
-        return getSlot(row, column) == Player.Nobody
+        return getSlot(row, column) == Player.NOBODY
                 && validTiles(row, column, player, false)[0] != null;
     }
 
@@ -286,10 +286,10 @@ public class ReversiBoard implements Board {
                         newBoard.field[i][j] = new PlayerTile(i, j,
                                 nextTurn);
                         newBoard.validTiles(i, j, nextTurn, true);
-                        if (nextTurn == Player.Human) {
-                            newBoard.nextTurn = Player.Computer;
+                        if (nextTurn == Player.HUMAN) {
+                            newBoard.nextTurn = Player.COMPUTER;
                         } else {
-                            newBoard.nextTurn = Player.Human;
+                            newBoard.nextTurn = Player.HUMAN;
                         }
                         TreeNode child = new TreeNode(newBoard, level);
                         children[counter] = child;
@@ -326,19 +326,19 @@ public class ReversiBoard implements Board {
         if (getNumberOfHumanTiles() + getNumberOfMachineTiles() == 4) {
             // Initial board has two human and two computer tiles.
             return firstPlayer;
-        } else if (nextTurn == Player.Computer && hasMoves(Player.Computer)) {
-            return Player.Computer;
-        } else if (nextTurn == Player.Human && hasMoves(Player.Human)) {
-            return Player.Human;
-        } else if (hasMoves(Player.Human) && !hasMoves(Player.Computer)) {
-            return Player.Human;
-        }  else if (hasMoves(Player.Computer) && !hasMoves(Player.Human)) {
-            return Player.Computer;
+        } else if (nextTurn == Player.COMPUTER && hasMoves(Player.COMPUTER)) {
+            return Player.COMPUTER;
+        } else if (nextTurn == Player.HUMAN && hasMoves(Player.HUMAN)) {
+            return Player.HUMAN;
+        } else if (hasMoves(Player.HUMAN) && !hasMoves(Player.COMPUTER)) {
+            return Player.HUMAN;
+        }  else if (hasMoves(Player.COMPUTER) && !hasMoves(Player.HUMAN)) {
+            return Player.COMPUTER;
         }
 
         // Nobody can make a turn.
         gameState = GameState.OVER;
-        return Player.Nobody;
+        return Player.NOBODY;
     }
 
     /**
@@ -351,16 +351,16 @@ public class ReversiBoard implements Board {
             throw new IllegalArgumentException("Row and column indices must be"
                     + " in the range between 1 and " + Board.SIZE);
         }
-        if (gameState == GameState.OVER || next() != Player.Human) {
+        if (gameState == GameState.OVER || next() != Player.HUMAN) {
             throw new IllegalMoveException("It's not your turn!");
         } else {
-            if (getSlot(row, col) == Player.Nobody && next() == Player.Human
-                    && validMove(row, col, Player.Human)) {
+            if (getSlot(row, col) == Player.NOBODY && next() == Player.HUMAN
+                    && validMove(row, col, Player.HUMAN)) {
                 ReversiBoard newBoard = clone();
                 newBoard.field[row][col]
-                        = new PlayerTile(row, col, Player.Human);
-                newBoard.validTiles(row, col, Player.Human, true);
-                newBoard.nextTurn = Player.Computer;
+                        = new PlayerTile(row, col, Player.HUMAN);
+                newBoard.validTiles(row, col, Player.HUMAN, true);
+                newBoard.nextTurn = Player.COMPUTER;
                 return newBoard;
             }
         }
@@ -372,7 +372,7 @@ public class ReversiBoard implements Board {
      */
     @Override
     public ReversiBoard machineMove() {
-        if (gameState == GameState.OVER || next() != Player.Computer) {
+        if (gameState == GameState.OVER || next() != Player.COMPUTER) {
             throw new IllegalMoveException("Machine made a move twice.");
         } else {
             TreeNode root = new TreeNode(this, level);
@@ -381,7 +381,7 @@ public class ReversiBoard implements Board {
             if (bestBoard != null) {
                 return bestBoard;
             } else {
-                nextTurn = Player.Human;
+                nextTurn = Player.HUMAN;
                 return this;
             }
         }
@@ -401,7 +401,7 @@ public class ReversiBoard implements Board {
     @Override
     public boolean gameOver() {
         return gameState == GameState.OVER
-                || (!hasMoves(Player.Human) && !hasMoves(Player.Computer));
+                || (!hasMoves(Player.HUMAN) && !hasMoves(Player.COMPUTER));
     }
 
     /**
@@ -411,11 +411,11 @@ public class ReversiBoard implements Board {
     public Player getWinner() {
         if (gameOver()) {
             if (getNumberOfHumanTiles() > getNumberOfMachineTiles()) {
-                return Player.Human;
+                return Player.HUMAN;
             } else if (getNumberOfHumanTiles() < getNumberOfMachineTiles()) {
-                return Player.Computer;
+                return Player.COMPUTER;
             } else {
-                return Player.Nobody;
+                return Player.NOBODY;
             }
         }
         return null;
@@ -430,7 +430,7 @@ public class ReversiBoard implements Board {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 if (field[i][j] != null
-                        && field[i][j].getPlayer() == Player.Human) {
+                        && field[i][j].getPlayer() == Player.HUMAN) {
                     numberOfTiles++;
                 }
             }
@@ -447,7 +447,7 @@ public class ReversiBoard implements Board {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 if (field[i][j] != null
-                        && field[i][j].getPlayer() == Player.Computer) {
+                        && field[i][j].getPlayer() == Player.COMPUTER) {
                     numberOfTiles++;
                 }
             }
@@ -463,7 +463,7 @@ public class ReversiBoard implements Board {
         if (field[row][col] != null) {
             return field[row][col].getPlayer();
         } else {
-            return Player.Nobody;
+            return Player.NOBODY;
         }
     }
 
@@ -499,7 +499,7 @@ public class ReversiBoard implements Board {
             for (int j = 0; j < SIZE; j++) {
                 if (field[i][j] == null) {
                     bob.append('.');
-                } else if (field[i][j].getPlayer() == Player.Human) {
+                } else if (field[i][j].getPlayer() == Player.HUMAN) {
                     bob.append('X');
                 } else {
                     bob.append('O');

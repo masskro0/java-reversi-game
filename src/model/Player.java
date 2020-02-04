@@ -9,16 +9,16 @@ public enum Player {
     /**
      * Represents the human player and his ability to make a move.
      */
-    Human,
+    HUMAN,
 
     /**
      * Represents the machine and his ability to make a move.
      */
-    Computer,
+    COMPUTER,
 
     /**
      * This one is only used, when neither the human player nor the computer
      * can make a move. This player results in a gameover.
      */
-    Nobody
+    NOBODY
 }
