@@ -287,9 +287,13 @@ public class View extends JFrame {
         machineThread = new Thread(() -> {
             model = model.machineMove();
             updateScores();
-            if (model.next() == Player.COMPUTER) {
+            while (model.next() == Player.COMPUTER) {
                 JOptionPane.showMessageDialog(null,
                         "You have to miss a turn.");
+                model = model.machineMove();
+                updateScores();
+                gameOverChecker();
+                gamePanel.repaint();
             }
             gameOverChecker();
             gamePanel.repaint();
@@ -301,9 +305,6 @@ public class View extends JFrame {
             model.setLevel(currentLevel);
         });
         machineThread.start();
-        if (!machineThread.isAlive() && model.next() == Player.COMPUTER) {
-            machineMove();
-        }
     }
 
     @SuppressWarnings("deprecation")
