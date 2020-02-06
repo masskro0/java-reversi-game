@@ -1,6 +1,5 @@
 package viewAndController;
-// TODO Meldungen wenn jemand aussetzen muss.
-// TODO Achsen sind nicht mittig
+// TODO Meldungen wenn jemand aussetzen muss. IsHumansTurn löschen
 import model.Board;
 import model.Player;
 import model.ReversiBoard;
@@ -15,19 +14,13 @@ import javax.swing.Box;
 import javax.swing.JOptionPane;
 import javax.swing.JComboBox;
 import javax.swing.BorderFactory;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.awt.Graphics;
-import java.awt.Toolkit;
 
 import java.util.LinkedList;
 
@@ -123,22 +116,28 @@ public class View extends JFrame {
      * Adds the vertical and horizontal numeric axis to the main frame.
      */
     private void addAxis() {
-        JPanel horizonal = new JPanel();
-        JPanel vertical = new JPanel();
-        horizonal.setLayout(new BoxLayout(horizonal, BoxLayout.X_AXIS));
-        vertical.setLayout(new BoxLayout(vertical, BoxLayout.Y_AXIS));
+        JPanel vertical = new JPanel(new GridLayout(Board.SIZE, 1));
+
+        JPanel horizonal = new JPanel(new GridLayout(1, Board.SIZE));
+        JPanel horizontalContainer = new JPanel();
+        horizontalContainer.setLayout(new BoxLayout(horizontalContainer,
+                BoxLayout.X_AXIS));
 
         // Add numbers to the JPanel.
         for (int i = 0; i < Board.SIZE; ++i) {
-            horizonal.add(Box.createHorizontalGlue());
-            horizonal.add(new JLabel(String.valueOf(i + 1)));
-            vertical.add(Box.createVerticalGlue());
+            JLabel horizontalLabel = new JLabel(String.valueOf(i + 1));
+            horizontalLabel.setHorizontalAlignment((int) CENTER_ALIGNMENT);
+            horizonal.add(horizontalLabel);
             vertical.add(new JLabel(String.valueOf(i + 1)));
         }
-        horizonal.add(Box.createHorizontalGlue());
-        vertical.add(Box.createVerticalGlue());
-        add(horizonal, BorderLayout.NORTH);
         add(vertical, BorderLayout.WEST);
+
+        // Call pack to set the size for the vertical axis.
+        pack();
+        horizontalContainer.add(Box.createHorizontalStrut(
+                vertical.getWidth()));
+        horizontalContainer.add(horizonal);
+        add(horizontalContainer, BorderLayout.NORTH);
     }
 
     /**
