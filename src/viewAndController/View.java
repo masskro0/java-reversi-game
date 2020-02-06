@@ -1,5 +1,6 @@
 package viewAndController;
-
+// TODO Meldungen wenn jemand aussetzen muss.
+// TODO Achsen sind nicht mittig
 import model.Board;
 import model.Player;
 import model.ReversiBoard;
@@ -26,6 +27,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.Graphics;
+import java.awt.Toolkit;
 
 import java.util.LinkedList;
 
@@ -103,6 +105,8 @@ public class View extends JFrame {
         gameSlots = new Slot[Board.SIZE][Board.SIZE];
         setTitle("Reversi");
         setMinimumSize(new Dimension(MIN_FRAME_WIDTH, MIN_FRAME_HEIGHT));
+
+        // Opens the window in the middle of the screen.
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         gamePanel = getGamePanel();
@@ -110,24 +114,26 @@ public class View extends JFrame {
         machineTiles = new JLabel(model.getNumberOfMachineTiles() + " ");
         addAxis();
         add(gamePanel, BorderLayout.CENTER);
-        add(getMenuPanel(), BorderLayout.SOUTH);
+        add(getLowerPanel(), BorderLayout.SOUTH);
         history = new LinkedList<>();
-
         pack();
     }
 
+    /**
+     * Adds the vertical and horizontal numeric axis to the main frame.
+     */
     private void addAxis() {
         JPanel horizonal = new JPanel();
         JPanel vertical = new JPanel();
         horizonal.setLayout(new BoxLayout(horizonal, BoxLayout.X_AXIS));
         vertical.setLayout(new BoxLayout(vertical, BoxLayout.Y_AXIS));
+
+        // Add numbers to the JPanel.
         for (int i = 0; i < Board.SIZE; ++i) {
             horizonal.add(Box.createHorizontalGlue());
             horizonal.add(new JLabel(String.valueOf(i + 1)));
-            horizonal.setBackground(Color.YELLOW);
             vertical.add(Box.createVerticalGlue());
             vertical.add(new JLabel(String.valueOf(i + 1)));
-            vertical.setBackground(Color.GRAY);
         }
         horizonal.add(Box.createHorizontalGlue());
         vertical.add(Box.createVerticalGlue());
@@ -135,33 +141,50 @@ public class View extends JFrame {
         add(vertical, BorderLayout.WEST);
     }
 
+    /**
+     * Updates the number of tiles of both players.
+     */
     private void updateScores() {
         humanTiles.setText(" " + model.getNumberOfHumanTiles());
         machineTiles.setText(model.getNumberOfMachineTiles() + " ");
     }
 
+    /**
+     * Initializes the game panel with slots and adds behaviour for each of
+     * them.
+     *
+     * @return Configured game panel.
+     */
     private JPanel getGamePanel() {
-        GridLayout gridLayout = new GridLayout(Board.SIZE, Board.SIZE);
-        JPanel gamePanel = new JPanel(gridLayout);
+        // Use a grid layout for an equal distribution of the slots.
+        JPanel gamePanel = new JPanel(new GridLayout(Board.SIZE, Board.SIZE));
         gamePanel.setBackground(GAME_PANEL_BACKGROUND);
 
         MouseListener mouseListener = new MouseAdapter() {
+            /**
+             * Executes a human move and afterwards machine moves when a slot
+             * was clicked. Also checks, if the machine thread is busy.
+             *
+             * @param e The mouse event.
+             */
             @Override
             public void mousePressed(MouseEvent e) {
                 super.mousePressed(e);
-
                 if (isHumansTurn && !model.gameOver()) {
-                    executeHumanMove(((Slot) e.getSource()).row, ((Slot) e.getSource()).col);
+                    humanMove(((Slot) e.getSource()).row,
+                            ((Slot) e.getSource()).column);
                 } else if (machineThread != null && machineThread.isAlive()
                         && !model.gameOver()) {
                     JOptionPane.showMessageDialog(null,
                             "The machine is currently calculating.");
                 } else if (!isHumansTurn && !model.gameOver()) {
-                    executeMachineMove();
+                    machineMove();
                 }
-                gameOverNotifier();
+                gameOverChecker();
             }
         };
+
+        // Create new slots and assign the upper {@code MouseListener} to them.
         for (int row = 0; row < Board.SIZE; row++) {
             for (int col = 0; col < Board.SIZE; col++) {
                 Slot slot = new Slot(row, col);
@@ -175,75 +198,98 @@ public class View extends JFrame {
         return gamePanel;
     }
 
-    private void gameOverNotifier() {
+    /**
+     * Checks whether the game is over or not and displays a message dialog
+     * when it is.
+     */
+    private void gameOverChecker() {
         if (model.gameOver()) {
             if (model.getWinner() == Player.HUMAN) {
                 JOptionPane.showMessageDialog(null,
-                        "Congratulations! You won.");
+                        "You have won!");
             } else if (model.getWinner() == Player.COMPUTER) {
                 JOptionPane.showMessageDialog(null,
-                        "Sorry! The machine wins.");
+                        "The computer has won!");
             } else {
                 JOptionPane.showMessageDialog(null,
-                        "The game ends in a tie.");
+                        "Draw!");
             }
         }
     }
 
-    private JPanel getMenuPanel() {
+    /**
+     * Creates and returns the lower panel which contains buttons, the level
+     * combo box and the scores values of both players.
+     *
+     * @return The {@code JPanel} object of the lower panel.
+     */
+    private JPanel getLowerPanel() {
+        // A container panel containing the score values, buttons and box.
         JPanel container = new JPanel(new BorderLayout());
 
-        JPanel menuPanel = new JPanel(new FlowLayout());
-        createJComponentsOfMenu(menuPanel);
+        // Contains buttons and box.
+        JPanel menuPanel = getMenuPanel();
 
+        // JLabel of the human's score.
         humanTiles.setFont(humanTiles.getFont().deriveFont(25f));
-        humanTiles.setForeground(Color.BLUE);
+        humanTiles.setForeground(HUMAN_TILE_COLOR);
 
+        // JLabel of the machine's score.
         machineTiles.setFont(humanTiles.getFont().deriveFont(25f));
-        machineTiles.setForeground(Color.RED);
+        machineTiles.setForeground(MACHINE_TILE_COLOR);
 
         container.add(humanTiles, BorderLayout.WEST);
         container.add(menuPanel);
         container.add(machineTiles, BorderLayout.EAST);
-
         return container;
     }
 
-    private void executeHumanMove(int row, int col) {
-        if (!model.gameOver() && model.move(row, col) == null) {
-            JOptionPane.showMessageDialog(null,
-                    "Invalid move.");
+    /**
+     * Executes a human move and repaints the GUI.
+     *
+     * @param row Row index.
+     * @param column Column index.
+     */
+    private void humanMove(int row, int column) {
+        if (!model.gameOver() && model.move(row, column) == null) {
+            // Plays a sound in case of a incorrect move.
+            Toolkit.getDefaultToolkit().beep();
             return;
         }
+
+        // Was a new move executed?
         if (!model.equals(history.peekLast())) {
             history.push(model);
             undoButtonModel.setEnabled(true);
         }
         if (!model.gameOver() && isHumansTurn) {
-            model = model.move(row, col);
+            model = model.move(row, column);
             gamePanel.repaint();
             isHumansTurn = false;
         } else {
             return;
         }
         if (!model.gameOver() && !isHumansTurn) {
-            executeMachineMove();
+            machineMove();
         }
     }
 
-    private void executeMachineMove() {
+    /**
+     * Executes a machine move and repaints the GUI.
+     */
+    private void machineMove() {
+        // Start the machine move in a new thread.
         machineThread = new Thread(() -> {
             model = model.machineMove();
-            gameOverNotifier();
+            updateScores();
+            gameOverChecker();
             gamePanel.repaint();
             isHumansTurn = true;
-            updateScores();
 
-            /*
-            Enables the game to recognize a level change while the
-            machine is calculating. After the calculation has finished the
-            new level takes effect.
-            */
+            /**
+             * Keeps the right level when the user changes it while the
+             * machine thread is busy.
+             */
             model.setLevel(currentLevel);
         });
         machineThread.start();
@@ -256,50 +302,47 @@ public class View extends JFrame {
         }
     }
 
-    private void createJComponentsOfMenu(JPanel menuPanel) {
+    /**
+     * Creates and configures the menu panel where all the buttons and the
+     * level box are included.
+     *
+     * @return The configured menu panel as a {@code JPanel} object.
+     */
+    private JPanel getMenuPanel() {
+        JPanel menuPanel = new JPanel(new FlowLayout());
         JComboBox levelBox = getLevelBox();
         levelBox.addActionListener(new ActionListener() {
-
             /**
-             * Sets the game's level of difficulty to the number that was
-             * selected.
-             * @param e The {@code ActionEvent} being triggered by selecting a
-             *          number.
+             * Sets the level to the one that was selected.
+             *
+             * @param actionEvent The {@code ActionEvent} after selecting a
+             *                   level.
              */
             @Override
-            public void actionPerformed(ActionEvent e) {
-                if (levelBox.getSelectedItem() != null) {
-                    currentLevel = (Integer) levelBox.getSelectedItem();
-                    model.setLevel(currentLevel);
-
-                    /*
-                    Prevents graphical uncleanliness after selecting a new
-                    level in fullscreen mode.
-                    */
-                    gamePanel.repaint();
-                }
+            public void actionPerformed(ActionEvent actionEvent) {
+                currentLevel = (Integer) levelBox.getSelectedItem();
+                model.setLevel(currentLevel);
             }
         });
         JButton newButton = new JButton("New");
         newButton.setMnemonic(KeyEvent.VK_N);
         newButton.addActionListener(new ActionListener() {
-
             /**
-             * Starts a new game with the same starting player by clicking
-             * the button.
-             * @param e The {@code ActionEvent} being triggered by clicking
-             *          the button.
+             * Starts a new game with the same settings.
+             *
+             * @param actionEvent The {@code ActionEvent} after clicking on the
+             *                   new button.
              */
             @Override
-            public void actionPerformed(ActionEvent e) {
-                isHumansTurn = model.getFirstPlayer() == Player.HUMAN;
+            public void actionPerformed(ActionEvent actionEvent) {
                 stopMachineThread();
-                model = new ReversiBoard((ReversiBoard) model, model.getFirstPlayer());
-                model.setLevel(currentLevel);
+                isHumansTurn = model.getFirstPlayer() == Player.HUMAN;
+                model = new ReversiBoard((ReversiBoard) model,
+                        model.getFirstPlayer());
+                updateScores();
                 gamePanel.repaint();
-
                 if (!isHumansTurn) {
-                    executeMachineMove();
+                    machineMove();
                 }
             }
         });
@@ -307,44 +350,54 @@ public class View extends JFrame {
         switchButton.setMnemonic(KeyEvent.VK_S);
         switchButton.addActionListener(new ActionListener() {
             /**
-             * Starts a new game and switches the beginning player by
-             * clicking the button.
-             * @param e The {@code ActionEvent} being triggered by clicking
-             *          the button.
+             * Starts a new game and switches the first player.
+             *
+             * @param actionEvent The {@code ActionEvent} after clicking on the
+             *                   switch button.
              */
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent actionEvent) {
                 stopMachineThread();
                 history.clear();
                 undoButtonModel.setEnabled(false);
                 if (model.getFirstPlayer() == Player.HUMAN) {
                     isHumansTurn = false;
-                    model = new ReversiBoard((ReversiBoard) model, Player.COMPUTER);
-                    model.setLevel(currentLevel);
-                    gamePanel.repaint();
-                    executeMachineMove();
+                    model = new ReversiBoard((ReversiBoard) model,
+                            Player.COMPUTER);
+                    machineMove();
                 } else {
                     isHumansTurn = true;
-                    model = new ReversiBoard();
-                    model.setLevel(currentLevel);
-                    gamePanel.repaint();
+                    model = new ReversiBoard((ReversiBoard) model,
+                            Player.HUMAN);
                 }
+                updateScores();
+                gamePanel.repaint();
             }
         });
         JButton undoButton = new JButton("Undo");
         undoButton.setMnemonic(KeyEvent.VK_U);
+
+        // Make the undo button initially unusable.
         undoButton.setEnabled(false);
+
+        // Pass the undo button's model to control its usability globally.
         setUndoButtonModel(undoButton.getModel());
         undoButton.addActionListener(new ActionListener() {
+            /**
+             * Undos the last move and repaints the gui.
+             *
+             * @param actionEvent The {@code ActionEvent} after clicking on the
+             *                    undo button.
+             */
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 if (history.size() > 0) {
                     model = history.pop();
-                    gamePanel.repaint();
                     updateScores();
                     if (history.size() == 0) {
                         undoButtonModel.setEnabled(false);
                     }
+                    gamePanel.repaint();
                 }
             }
         });
@@ -352,14 +405,14 @@ public class View extends JFrame {
         JButton quitButton = new JButton("Quit");
         quitButton.setMnemonic(KeyEvent.VK_Q);
         quitButton.addActionListener(new ActionListener() {
-
             /**
-             * Stops the running machine thread and closes the game.
-             * @param e The {@code ActionEvent} being triggered by clicking
-             *          the button.
+             * Stops the machine thread and disposes the GUI.
+             *
+             * @param actionEvent The {@code ActionEvent} being triggered by
+             *                    clicking the button.
              */
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent actionEvent) {
                 stopMachineThread();
                 dispose();
             }
@@ -369,70 +422,93 @@ public class View extends JFrame {
         menuPanel.add(switchButton);
         menuPanel.add(undoButton);
         menuPanel.add(quitButton);
+        return menuPanel;
     }
 
+    /**
+     * Sets the undo button's model to control its usability globally.
+     *
+     * @param undoButtonModel The model of the undo button.
+     */
     private void setUndoButtonModel(ButtonModel undoButtonModel) {
         this.undoButtonModel = undoButtonModel;
     }
 
+    /**
+     * Creates and configures the drop down box for the level configuration.
+     *
+     * @return The {@code JComboBox} of the level box.
+     */
     private JComboBox getLevelBox() {
         Integer[] levels = new Integer[MAX_LEVEL];
-
         for (int i = 0; i < MAX_LEVEL; i++) {
             levels[i] = i + 1;
         }
         JComboBox levelBox = new JComboBox<>(levels);
         levelBox.setSelectedItem(currentLevel);
-
         return levelBox;
     }
 
     /**
-     * The {@code Slot} is the main component of the {@code gamePanel}, which
-     * indicates if or by whom this position in the game-grid is already taken.
+     * This class represents a slot on the {@code gamePanel}. It is analogue to
+     * a player tile of the game board model.
      */
     private final class Slot extends JPanel {
 
+        /**
+         * The row index of this slot.
+         */
         private final int row;
-        private final int col;
 
         /**
-         * Constructs a new {@code Slot} and sets its {@code row} and {@code
-         * col}umn. Initially the slot is no witness.
-         *
-         * @param row The row of the slot indicated at 0.
-         * @param col The column of the slot indicated at 0.
+         * The column index of this slot.
          */
-        private Slot(int row, int col) {
+        private final int column;
+
+        /**
+         * Creates a new {@code Slot} object.
+         *
+         * @param row Row index of this slot.
+         * @param column Column index of this slot.
+         */
+        private Slot(int row, int column) {
             this.row = row;
-            this.col = col;
+            this.column = column;
             setBackground(GAME_PANEL_BACKGROUND);
+
+            // Divide each slot by a border.
             setBorder(BorderFactory.createLineBorder(BORDER_COLOR));
         }
 
         /**
-         * Manages the appearance of the slot with respect to the gameModel's
-         * game state.GameOver
+         * Paints a single slot on the {@code gamePanel} object to visualize
+         * its appearance.
          *
-         * @param gr The object to draw onto.
+         * @param gr The graphic object.
          */
         @Override
         protected void paintComponent(Graphics gr) {
             super.paintComponent(gr);
-            if (model.getSlot(row, col) != Player.NOBODY) {
+            if (model.getSlot(row, column) != Player.NOBODY) {
+                // Get the coordinates of the center of the circle.
                 int cntrX = getWidth() / 2;
                 int cntrY = getHeight() / 2;
                 int radius;
+
+                // Get the radius dependent on the smaller size.
                 if (cntrX < cntrY) {
-                    radius = getWidth() / 2 - 3;
+                    // Leave a little bit space so the circles won't overlap.
+                    radius = getWidth() / 2 - 2;
                 } else {
-                    radius = getHeight() / 2 - 3;
+                    radius = getHeight() / 2 - 2;
                 }
-                if (model.getSlot(row, col) == Player.HUMAN) {
+                if (model.getSlot(row, column) == Player.HUMAN) {
                     gr.setColor(HUMAN_TILE_COLOR);
-                } else if (model.getSlot(row, col) == Player.COMPUTER) {
+                } else if (model.getSlot(row, column) == Player.COMPUTER) {
                     gr.setColor(MACHINE_TILE_COLOR);
                 }
+
+                // Draw the circles.
                 gr.fillOval(cntrX - radius, cntrY - radius, radius * 2,
                         radius * 2);
                 gr.drawOval(cntrX - radius, cntrY - radius, radius * 2,
