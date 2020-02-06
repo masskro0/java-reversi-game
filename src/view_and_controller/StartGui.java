@@ -1,4 +1,4 @@
-package viewAndController;
+package view_and_controller;
 
 import model.Board;
 import model.ReversiBoard;

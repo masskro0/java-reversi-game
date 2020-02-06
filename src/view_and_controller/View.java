@@ -1,5 +1,5 @@
-package viewAndController;
-// TODO Meldungen wenn jemand aussetzen muss. IsHumansTurn löschen
+package view_and_controller;
+
 import model.Board;
 import model.Player;
 import model.ReversiBoard;
@@ -14,13 +14,19 @@ import javax.swing.Box;
 import javax.swing.JOptionPane;
 import javax.swing.JComboBox;
 import javax.swing.BorderFactory;
-import java.awt.*;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Toolkit;
 
 import java.util.LinkedList;
 
@@ -56,11 +62,6 @@ public class View extends JFrame {
     private Board model;
 
     /**
-     * {@code true} if and only if it is the human's turn.
-     */
-    private boolean isHumansTurn;
-
-    /**
      * A separate thread to execute machine moves, so a human can still
      * interact with the UI.
      */
@@ -93,7 +94,6 @@ public class View extends JFrame {
      * @param model The game board.
      */
     public View(Board model) {
-        isHumansTurn = model.getFirstPlayer() == Player.HUMAN;
         this.model = model;
         gameSlots = new Slot[Board.SIZE][Board.SIZE];
         setTitle("Reversi");
@@ -169,14 +169,15 @@ public class View extends JFrame {
             @Override
             public void mousePressed(MouseEvent e) {
                 super.mousePressed(e);
-                if (isHumansTurn && !model.gameOver()) {
+                if (model.next() == Player.HUMAN && !model.gameOver()) {
                     humanMove(((Slot) e.getSource()).row,
                             ((Slot) e.getSource()).column);
                 } else if (machineThread != null && machineThread.isAlive()
                         && !model.gameOver()) {
                     JOptionPane.showMessageDialog(null,
                             "The machine is currently calculating.");
-                } else if (!isHumansTurn && !model.gameOver()) {
+                } else if (model.next() == Player.COMPUTER
+                        && !model.gameOver()) {
                     machineMove();
                 }
                 gameOverChecker();
@@ -261,14 +262,19 @@ public class View extends JFrame {
             history.push(model);
             undoButtonModel.setEnabled(true);
         }
-        if (!model.gameOver() && isHumansTurn) {
+        if (!model.gameOver() && model.next() == Player.HUMAN) {
             model = model.move(row, column);
+            updateScores();
             gamePanel.repaint();
-            isHumansTurn = false;
         } else {
             return;
         }
-        if (!model.gameOver() && !isHumansTurn) {
+        if (!model.gameOver() && model.next() == Player.HUMAN) {
+            JOptionPane.showMessageDialog(null,
+                    "The machine has to miss a turn.");
+            return;
+        }
+        if (!model.gameOver() && model.next() == Player.COMPUTER) {
             machineMove();
         }
     }
@@ -281,9 +287,12 @@ public class View extends JFrame {
         machineThread = new Thread(() -> {
             model = model.machineMove();
             updateScores();
+            if (model.next() == Player.COMPUTER) {
+                JOptionPane.showMessageDialog(null,
+                        "You have to miss a turn.");
+            }
             gameOverChecker();
             gamePanel.repaint();
-            isHumansTurn = true;
 
             /**
              * Keeps the right level when the user changes it while the
@@ -292,6 +301,9 @@ public class View extends JFrame {
             model.setLevel(currentLevel);
         });
         machineThread.start();
+        if (!machineThread.isAlive() && model.next() == Player.COMPUTER) {
+            machineMove();
+        }
     }
 
     @SuppressWarnings("deprecation")
@@ -335,12 +347,12 @@ public class View extends JFrame {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 stopMachineThread();
-                isHumansTurn = model.getFirstPlayer() == Player.HUMAN;
+                history.clear();
                 model = new ReversiBoard((ReversiBoard) model,
                         model.getFirstPlayer());
                 updateScores();
                 gamePanel.repaint();
-                if (!isHumansTurn) {
+                if (model.next() == Player.COMPUTER) {
                     machineMove();
                 }
             }
@@ -360,12 +372,10 @@ public class View extends JFrame {
                 history.clear();
                 undoButtonModel.setEnabled(false);
                 if (model.getFirstPlayer() == Player.HUMAN) {
-                    isHumansTurn = false;
                     model = new ReversiBoard((ReversiBoard) model,
                             Player.COMPUTER);
                     machineMove();
                 } else {
-                    isHumansTurn = true;
                     model = new ReversiBoard((ReversiBoard) model,
                             Player.HUMAN);
                 }
